@@ -1,4 +1,4 @@
- /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -331,7 +331,7 @@ void InsertLinkTables(AdjList* nodeArray, int totalNum)
           int deviceDst = dst + 1; //Rapidnet's node ID starts from 1
           //if (nodeArray[src].ntype == AdjList::ENDPOINT)
           //{
-              insert_linkhr(deviceSrc, deviceDst);
+          //insert_linkhr(deviceSrc, deviceDst);
               //}
             //else
             //{
@@ -502,7 +502,11 @@ void SchedulePacketTrans(int totalNum, int totalSwcNum, int hostPairs, int packe
      send a series of packets to it*/
   cout<<"SchedulePacket Trans started"<<endl;
   double trigger_time = 4.0000;
-  srand(1); 
+  srand(1);
+  hostPairs = 1;
+  int srcArray[] = {0,0,55};
+  int dstArray[] = {36,64,53};
+
   for (int i = 0; i < hostPairs; i++, trigger_time += 0.1)
     {
       int src = (rand() % (totalSwcNum));
@@ -512,7 +516,8 @@ void SchedulePacketTrans(int totalNum, int totalSwcNum, int hostPairs, int packe
           dst = (rand() % (totalSwcNum));
         }
       while (dst == src);
-
+      src = srcArray[i];
+      dst = dstArray[i];
       std::cout << "Communicating pair: (" << src << "," << dst << ")" << endl;
       double insert_time = trigger_time;
       ostringstream ss;
@@ -548,7 +553,7 @@ void SerializeProv(int totalNum, string storePath)
 {
   vector<string> relNames;
   relNames.push_back("ruleExec");
-  relNames.push_back("prov");
+  //relNames.push_back("prov");
 
   for (int i = 0; i < totalNum; i++)
     {
@@ -563,9 +568,9 @@ main (int argc, char *argv[])
   LogComponentEnable("PktfwdNormProvEte", LOG_LEVEL_INFO);
   LogComponentEnable("RapidNetApplicationBase", LOG_LEVEL_INFO);
 
-  uint32_t hostPairs = 10;
+  uint32_t hostPairs = 1;
   string storePath = "/localdrive1/harshal/pktfwd_prov_storage_nocomp_ete/";
-  uint32_t packetNum = 10;
+  uint32_t packetNum = 1;
 
   CommandLine cmd;
   cmd.AddValue("hostPairs", "Number of pairs of communicating hosts", hostPairs);
@@ -633,7 +638,7 @@ main (int argc, char *argv[])
   apps.Stop (Seconds (500.0));
 
   Simulator::Schedule (Seconds(499.0000), SerializeProv, totalNum, storePath);  
-
+  Simulator::Schedule(Seconds(500.0000),Print);
   Simulator::Run ();
   Simulator::Destroy ();
 

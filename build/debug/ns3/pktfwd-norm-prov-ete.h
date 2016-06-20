@@ -76,7 +76,9 @@ protected:
 
   virtual void Prov_rh1_1Eca0Ins (Ptr<Tuple> initPacket);
 
-  virtual void Prov_rh1_1Eca1Ins (Ptr<Tuple> linkhr);
+  virtual void Prov_rh1_1Eca1Ins (Ptr<Tuple> flowEntry);
+
+  virtual void Prov_rh1_1Eca2Ins (Ptr<Tuple> link);
 
   virtual void Prov_rh2_1_eca (Ptr<Tuple> packet);
 

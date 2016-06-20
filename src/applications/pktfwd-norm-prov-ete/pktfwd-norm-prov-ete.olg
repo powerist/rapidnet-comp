@@ -31,10 +31,9 @@ r03 prov(@Node, VID, RID, Node) :-
 
 /*Switch program*/
 /*A hit in the routing table, forward the packet accordingly*/
-prov_rs1_1 epacketTemp(@RLOC, Next, SrcAdd, DstAdd, Data, RID, R, List) :- 
-	   /*device(@Switch, Dvtype),*/ 
-	   packet(@Node, SrcAdd, DstAdd, Data), 
-	   flowEntry(@Node, DstAdd, Next), 
+prov_rs1_1 epacketTemp(@RLOC, Next, SrcAdd, DstAdd, Data, RID, R, List) :-  
+	   packet(@Node, SrcAdd, DstAdd, Data),
+	   flowEntry(@Node, DstAdd, Next),  
 	   link(@Node, Next), 
 	   PID2 := f_sha1(((("packet"+ Node)+ SrcAdd)+ DstAdd)+ Data), 
 	   List := f_append(PID2), 
@@ -62,34 +61,25 @@ prov_rs1_5 prov(@Next, VID, RID, RLOC) :-
 	   VID := f_sha1(((("packet"+ Next)+ SrcAdd)+ DstAdd)+ Data).
 
 /*Host program*/
-prov_rh1_1 epacketTemp(@RLOC, Next, SrcAdd, DstAdd, Data, RID, R, List) :- 
-	   /*device(@Node, Dvtype),*/ 
-	   initPacket(@Node, SrcAdd, DstAdd, Data), 
-	   link(@Node, Next), 
-	   /*PID1 := f_sha1(("device"+ Host)+ Dvtype), 
-	   List := f_append(PID1),*/ 
+prov_rh1_1 epacketTemp(@RLOC, Next, SrcAdd, DstAdd, Data, RID, R, List) :-  
+	   initPacket(@Node, SrcAdd, DstAdd, Data),
+	   flowEntry(@Node, DstAdd, Next),  
+	   link(@Node, Next),  
 	   PID2 := f_sha1(((("initPacket"+ Node)+ SrcAdd)+ DstAdd)+ Data), 
-	   List := f_append(PID2), 
-	   /*List := f_concat(List, List2),*/ 
-	   PID3 := f_sha1(("linkhr"+ Node)+ Next), 
+	   List := f_append(PID2),  
+	   PID3 := f_sha1(("link"+ Node)+ Next), 
 	   List3 := f_append(PID3), 
-	   List := f_concat(List, List3), 
-	   /*Dvtype == HOST,*/ 
+	   List := f_concat(List, List3),  
 	   RLOC := Node, 
 	   R := "rh1", 
 	   RID := f_sha1((R+ RLOC)+ List).
 
 /*Receive a packet*/
 prov_rh2_1 erecvPacketTemp(@RLOC, Node, SrcAdd, DstAdd, Data, RID, R, List) :- 
-	   /*device(@Host, Dvtype),*/ 
 	   packet(@Node, SrcAdd, DstAdd, Data), 
 	   DstAdd == Node, 
-	   /*Dvtype == HOST, 
-	   PID1 := f_sha1(("device"+ Host)+ Dvtype), 
-	   List := f_append(PID1), */
 	   PID2 := f_sha1(((("packet"+ Node)+ SrcAdd)+ DstAdd)+ Data), 
-	   List := f_append(PID2), 
-	   /*List := f_concat(List, List2),*/ 
+	   List := f_append(PID2),
 	   RLOC := Node, 
 	   R := "rh2", 
 	   RID := f_sha1((R+ RLOC)+ List).
