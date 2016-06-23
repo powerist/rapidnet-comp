@@ -34,6 +34,8 @@
 #include "ns3/ipv4-address-helper.h"
 #include "ns3/ipv4-address.h"
 
+#include "pktfwd-utility.h"
+
 /* Device identification*/
 #define device(host, dvtype)\
   tuple(PktfwdNormProv::DEVICE,\
@@ -561,11 +563,13 @@ main (int argc, char *argv[])
   uint32_t hostPairs = 1;
   string storePath = "/localdrive1/chen/prov_storage/";
   uint32_t packetNum = 20;
+  double finishTime = 500.00;
 
   CommandLine cmd;
   cmd.AddValue("hostPairs", "Number of pairs of communicating hosts", hostPairs);
   cmd.AddValue("storePath", "The path to the directory for provenance storage", storePath);
   cmd.AddValue("packetNum", "Number of packets sent between each pair of hosts", packetNum);
+  cmd.AddValue("finishTime", "Finish time of the experiment", finishTime);
   cmd.Parse(argc, argv);
 
   AdjList* nodeArray = new AdjList[MAX_NODE_NUM];
@@ -624,9 +628,9 @@ main (int argc, char *argv[])
   apps = appHelper->Install (csmaNodes);
 
   apps.Start (Seconds (0.0));
-  apps.Stop (Seconds (500.0));
+  apps.Stop (Seconds (finishTime));
 
-  Simulator::Schedule (Seconds(499.0000), SerializeProv, totalNum, storePath);  
+  Simulator::Schedule (Seconds(finishTime - 1), SerializeProv, totalNum, storePath);  
 
   Simulator::Run ();
   Simulator::Destroy ();

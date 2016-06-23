@@ -29,6 +29,9 @@ all_modules = (
     'applications/udp-echo',
     'applications/myproto',
 
+    'applications/pktfwd-norm-dist-hlist-online',
+    'applications/pktfwd-norm-dist-hlist-rmitm',
+
     'applications/dns',
     'applications/dns-prov',
     'applications/dns-prov-comp-strawman',

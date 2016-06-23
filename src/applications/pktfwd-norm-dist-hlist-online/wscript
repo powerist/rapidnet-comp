@@ -1,0 +1,13 @@
+## -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
+
+def build(bld):
+    module = bld.create_ns3_module('pktfwd-norm-dist-hlist-online', ['internet-stack'])
+    module.source = [
+        'pktfwd-norm-dist-hlist-online.cc',
+        ]
+    headers = bld.new_task_gen('ns3header')
+    headers.module = 'pktfwd-norm-dist-hlist-online'
+    headers.source = [
+        'pktfwd-norm-dist-hlist-online.h',
+        'pktfwd-norm-dist-hlist-online-helper.h',
+        ]
