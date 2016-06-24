@@ -15,7 +15,7 @@ materialize(programID,infinity,infinity,keys(2)). /*Allow the user to specify pr
 materialize(ruleExec, infinity, infinity, keys(2:cid)).
 materialize(provLink, infinity, infinity, keys(2:cid,3:int32,4,5:cid,6:int32)).
 materialize(equiHashTable,infinity,infinity,keys(2)). /*Hash table for equivalence detection*/
-materialize(provHashTable,infinity,infinity,keys(3:list)). /*Hash table for provenance query*/
+materialize(provHashTable,infinity,infinity,keys(3:str)). /*Hash table for provenance query*/
 materialize(recvPacketProv, infinity, infinity, keys(2:cid))./*Provenance-queryable recv packet*/
 
 /* 'ID' is a keyword. Parse error on using id for type!
@@ -210,12 +210,12 @@ ro2 recvPacketProv(@Node, PID, EquiHash, PIDev) :-
 
 
 /* Execution of original rh2*/
-rh2 recvPacket(@Node, SrcAdd, DstAdd, Data, PIDHash) :-
+rh2 recvPacketNP(@Node, SrcAdd, DstAdd, Data, PIDHash) :-
  packet(@Node, SrcAdd, DstAdd, Data, PIDHash),
  DstAdd == Node.
 
 rho3 recvPacketProv(@Node, PID, EquiHash, PIDev) :-
- recvPacket(@Node, SrcAdd, DstAdd, Data, PIDHash),
+ recvPacketNP(@Node, SrcAdd, DstAdd, Data, PIDHash),
  DstAdd == Node,
         PID := f_sha1("recvPacket" + Node + SrcAdd + DstAdd + Data),
  PIDequi := f_first(PIDHash),

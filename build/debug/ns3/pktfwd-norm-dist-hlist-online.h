@@ -45,6 +45,7 @@ public:
   static const string PROVLINK;
   static const string PROV_RH2_5RECVPACKETSEND;
   static const string RECVPACKET;
+  static const string RECVPACKETNP;
   static const string RECVPACKETPROV;
   static const string RULEEXEC;
 
@@ -110,9 +111,7 @@ protected:
 
   virtual void Rh2_eca (Ptr<Tuple> packet);
 
-  virtual void Rho3Eca0Ins (Ptr<Tuple> recvPacket);
-
-  virtual void Rho3Eca0Del (Ptr<Tuple> recvPacket);
+  virtual void Rho3_eca (Ptr<Tuple> recvPacketNP);
 
 };
 

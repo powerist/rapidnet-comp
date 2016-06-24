@@ -32,6 +32,7 @@ const string PktfwdNormDistHlistOnline::PROVHASHTABLE = "provHashTable";
 const string PktfwdNormDistHlistOnline::PROVLINK = "provLink";
 const string PktfwdNormDistHlistOnline::PROV_RH2_5RECVPACKETSEND = "prov_rh2_5recvPacketsend";
 const string PktfwdNormDistHlistOnline::RECVPACKET = "recvPacket";
+const string PktfwdNormDistHlistOnline::RECVPACKETNP = "recvPacketNP";
 const string PktfwdNormDistHlistOnline::RECVPACKETPROV = "recvPacketProv";
 const string PktfwdNormDistHlistOnline::RULEEXEC = "ruleExec";
 
@@ -107,7 +108,7 @@ PktfwdNormDistHlistOnline::InitDatabase ()
     attrdef ("programID_attr2", IPV4)));
 
   AddRelationWithKeys (PROVHASHTABLE, attrdeflist (
-    attrdef ("provHashTable_attr3", LIST)));
+    attrdef ("provHashTable_attr3", STR)));
 
   AddRelationWithKeys (PROVLINK, attrdeflist (
     attrdef ("provLink_attr2", ID),
@@ -222,13 +223,9 @@ PktfwdNormDistHlistOnline::DemuxRecv (Ptr<Tuple> tuple)
     {
       Rh2_eca (tuple);
     }
-  if (IsInsertEvent (tuple, RECVPACKET))
+  if (IsRecvEvent (tuple, RECVPACKETNP))
     {
-      Rho3Eca0Ins (tuple);
-    }
-  if (IsDeleteEvent (tuple, RECVPACKET))
-    {
-      Rho3Eca0Del (tuple);
+      Rho3_eca (tuple);
     }
 }
 
@@ -1468,27 +1465,27 @@ PktfwdNormDistHlistOnline::Rh2_eca (Ptr<Tuple> packet)
       VarExpr::New ("packet_attr1"))));
 
   result = result->Project (
-    RECVPACKET,
+    RECVPACKETNP,
     strlist ("packet_attr1",
       "packet_attr2",
       "packet_attr3",
       "packet_attr4",
       "packet_attr5"),
-    strlist ("recvPacket_attr1",
-      "recvPacket_attr2",
-      "recvPacket_attr3",
-      "recvPacket_attr4",
-      "recvPacket_attr5"));
+    strlist ("recvPacketNP_attr1",
+      "recvPacketNP_attr2",
+      "recvPacketNP_attr3",
+      "recvPacketNP_attr4",
+      "recvPacketNP_attr5"));
 
-  Insert (result);
+  SendLocal (result);
 }
 
 void
-PktfwdNormDistHlistOnline::Rho3Eca0Ins (Ptr<Tuple> recvPacket)
+PktfwdNormDistHlistOnline::Rho3_eca (Ptr<Tuple> recvPacketNP)
 {
-  RAPIDNET_LOG_INFO ("Rho3Eca0Ins triggered");
+  RAPIDNET_LOG_INFO ("Rho3_eca triggered");
 
-  Ptr<Tuple> result = recvPacket;
+  Ptr<Tuple> result = recvPacketNP;
 
   result->Assign (Assignor::New ("PID",
     FSha1::New (
@@ -1497,18 +1494,18 @@ PktfwdNormDistHlistOnline::Rho3Eca0Ins (Ptr<Tuple> recvPacket)
           Operation::New (RN_PLUS,
             Operation::New (RN_PLUS,
               ValueExpr::New (StrValue::New ("recvPacket")),
-              VarExpr::New ("recvPacket_attr1")),
-            VarExpr::New ("recvPacket_attr2")),
-          VarExpr::New ("recvPacket_attr3")),
-        VarExpr::New ("recvPacket_attr4")))));
+              VarExpr::New ("recvPacketNP_attr1")),
+            VarExpr::New ("recvPacketNP_attr2")),
+          VarExpr::New ("recvPacketNP_attr3")),
+        VarExpr::New ("recvPacketNP_attr4")))));
 
   result->Assign (Assignor::New ("PIDequi",
     FFirst::New (
-      VarExpr::New ("recvPacket_attr5"))));
+      VarExpr::New ("recvPacketNP_attr5"))));
 
   result->Assign (Assignor::New ("PIDHash1",
     FRemoveFirst::New (
-      VarExpr::New ("recvPacket_attr5"))));
+      VarExpr::New ("recvPacketNP_attr5"))));
 
   result->Assign (Assignor::New ("PIDev",
     FFirst::New (
@@ -1532,12 +1529,12 @@ PktfwdNormDistHlistOnline::Rho3Eca0Ins (Ptr<Tuple> recvPacket)
 
   result = result->Select (Selector::New (
     Operation::New (RN_EQ,
-      VarExpr::New ("recvPacket_attr3"),
-      VarExpr::New ("recvPacket_attr1"))));
+      VarExpr::New ("recvPacketNP_attr3"),
+      VarExpr::New ("recvPacketNP_attr1"))));
 
   result = result->Project (
     RECVPACKETPROV,
-    strlist ("recvPacket_attr1",
+    strlist ("recvPacketNP_attr1",
       "PID",
       "EquiHash",
       "PIDev"),
@@ -1547,71 +1544,5 @@ PktfwdNormDistHlistOnline::Rho3Eca0Ins (Ptr<Tuple> recvPacket)
       "recvPacketProv_attr4"));
 
   Insert (result);
-}
-
-void
-PktfwdNormDistHlistOnline::Rho3Eca0Del (Ptr<Tuple> recvPacket)
-{
-  RAPIDNET_LOG_INFO ("Rho3Eca0Del triggered");
-
-  Ptr<Tuple> result = recvPacket;
-
-  result->Assign (Assignor::New ("PID",
-    FSha1::New (
-      Operation::New (RN_PLUS,
-        Operation::New (RN_PLUS,
-          Operation::New (RN_PLUS,
-            Operation::New (RN_PLUS,
-              ValueExpr::New (StrValue::New ("recvPacket")),
-              VarExpr::New ("recvPacket_attr1")),
-            VarExpr::New ("recvPacket_attr2")),
-          VarExpr::New ("recvPacket_attr3")),
-        VarExpr::New ("recvPacket_attr4")))));
-
-  result->Assign (Assignor::New ("PIDequi",
-    FFirst::New (
-      VarExpr::New ("recvPacket_attr5"))));
-
-  result->Assign (Assignor::New ("PIDHash1",
-    FRemoveFirst::New (
-      VarExpr::New ("recvPacket_attr5"))));
-
-  result->Assign (Assignor::New ("PIDev",
-    FFirst::New (
-      VarExpr::New ("PIDHash1"))));
-
-  result->Assign (Assignor::New ("PIDHash2",
-    FRemoveFirst::New (
-      VarExpr::New ("PIDHash1"))));
-
-  result->Assign (Assignor::New ("ProgID",
-    FFirst::New (
-      VarExpr::New ("PIDHash2"))));
-
-  result->Assign (Assignor::New ("EquiHash",
-    FSha1::New (
-      Operation::New (RN_PLUS,
-        Operation::New (RN_PLUS,
-          ValueExpr::New (StrValue::New ("")),
-          VarExpr::New ("ProgID")),
-        VarExpr::New ("PIDequi")))));
-
-  result = result->Select (Selector::New (
-    Operation::New (RN_EQ,
-      VarExpr::New ("recvPacket_attr3"),
-      VarExpr::New ("recvPacket_attr1"))));
-
-  result = result->Project (
-    RECVPACKETPROV,
-    strlist ("recvPacket_attr1",
-      "PID",
-      "EquiHash",
-      "PIDev"),
-    strlist ("recvPacketProv_attr1",
-      "recvPacketProv_attr2",
-      "recvPacketProv_attr3",
-      "recvPacketProv_attr4"));
-
-  Delete (result);
 }
 
