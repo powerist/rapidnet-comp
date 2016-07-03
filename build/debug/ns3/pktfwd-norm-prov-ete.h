@@ -62,7 +62,11 @@ protected:
 
   virtual void R00Eca1Ins (Ptr<Tuple> initPacket);
 
+  virtual void R00Eca1Del (Ptr<Tuple> initPacket);
+
   virtual void R03Eca1Ins (Ptr<Tuple> flowEntry);
+
+  virtual void R03Eca1Del (Ptr<Tuple> flowEntry);
 
   virtual void Prov_rs1_1_eca (Ptr<Tuple> packet);
 

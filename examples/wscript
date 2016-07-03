@@ -305,11 +305,16 @@ def build(bld):
     obj = bld.create_ns3_program('dns-prov-comp-online-test')
     obj.source = 'dns-prov-comp-online-test.cc'
 
+    
     obj = bld.create_ns3_program('pktfwd-norm-prov-ete-test')
     obj.source = 'pktfwd-norm-prov-ete-test.cc'
 
     obj = bld.create_ns3_program('pktfwd-norm-large-scale-nocomp-ete-test')
     obj.source = 'pktfwd-norm-large-scale-nocomp-ete-test.cc'
+
+    
+    obj = bld.create_ns3_program('pktfwd-norm-large-scale-strawman-ete-test')
+    obj.source = 'pktfwd-norm-large-scale-strawman-ete-test.cc'
 
 
     obj = bld.create_ns3_program('pktfwd-norm-large-scale-online-ete-test')
@@ -329,3 +334,15 @@ def build(bld):
 
     obj = bld.create_ns3_program('pktfwd-large-scale-dist-hlist-rmitm-test')
     obj.source = 'pktfwd-large-scale-dist-hlist-rmitm-test.cc'
+    
+
+    obj = bld.create_ns3_program('pktfwd-norm-large-scale-nocomp-ete-bandwidth-test')
+    obj.source = 'pktfwd-norm-large-scale-nocomp-ete-bandwidth-test.cc'
+
+
+    obj = bld.create_ns3_program('pktfwd-large-scale-dist-hlist-online-bandwidth-test')
+    obj.source = 'pktfwd-large-scale-dist-hlist-online-bandwidth-test.cc'
+
+    
+    obj = bld.create_ns3_program('pktfwd-large-scale-dist-hlist-rmitm-bandwidth-test')
+    obj.source = 'pktfwd-large-scale-dist-hlist-rmitm-bandwidth-test.cc'

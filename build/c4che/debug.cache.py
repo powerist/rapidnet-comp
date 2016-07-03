@@ -4,7 +4,7 @@ CCFLAGS_GTK_CONFIG_STORE = ['-pthread']
 CCFLAGS_MACBUNDLE = ['-fPIC']
 CCFLAGS_PTHREAD = '-pthread'
 CCFLAGS_PYEXT = ['-fvisibility=hidden']
-CC_VERSION = ('4', '9', '2')
+CC_VERSION = ('4', '6', '3')
 COMPILER_CXX = 'g++'
 CPP = '/usr/bin/cpp'
 CPPPATH_GTK_CONFIG_STORE = ['/usr/include/gtk-2.0', '/usr/lib/x86_64-linux-gnu/gtk-2.0/include', '/usr/include/atk-1.0', '/usr/include/cairo', '/usr/include/gdk-pixbuf-2.0', '/usr/include/pango-1.0', '/usr/include/gio-unix-2.0/', '/usr/include/glib-2.0', '/usr/lib/x86_64-linux-gnu/glib-2.0/include', '/usr/include/pixman-1', '/usr/include/freetype2', '/usr/include/libpng12']
@@ -72,7 +72,7 @@ LINK_CXX = ['/usr/bin/g++']
 NS3_ACTIVE_VARIANT = 'debug'
 NS3_BUILDDIR = '/home/harshal/rapidnet-comp/build'
 NS3_MODULES = ['ns3-core', 'ns3-common', 'ns3-simulator', 'ns3-contrib', 'ns3-node', 'ns3-internet-stack', 'ns3-point-to-point', 'ns3-csma', 'ns3-emu', 'ns3-bridge', 'ns3-tap-bridge', 'ns3-virtual-net-device', 'ns3-onoff', 'ns3-packet-sink', 'ns3-udp-echo', 'ns3-myproto', 'ns3-pktfwd-norm-dist-hlist-online', 'ns3-pktfwd-norm-dist-hlist-rmitm', 'ns3-dns', 'ns3-dns-prov', 'ns3-dns-prov-comp-strawman', 'ns3-dns-prov-comp-online', 'ns3-pktfwd-norm-prov-ete', 'ns3-pktfwd-norm-prov-comp-online-ete', 'ns3-pktfwd-norm-prov-comp-strawman-ete', 'ns3-olsr', 'ns3-global-routing', 'ns3-static-routing', 'ns3-list-routing', 'ns3-mobility', 'ns3-wifi', 'ns3-helper', 'ns3-stats', 'ns3-v4ping', 'ns3-rapidnet', 'ns3-values', 'ns3-tests', 'ns3-rapidnet-compiler', 'ns3-arp', 'ns3-sdn-arp', 'ns3-load-balancing', 'ns3-load-balancer-learning', 'ns3-sdn-load-balancing', 'ns3-firewall', 'ns3-sdn-mac-learning', 'ns3-sdn-mac-learning-bcast', 'ns3-pingpong', 'ns3-reachable', 'ns3-pathvector', 'ns3-reachable2', 'ns3-pathvector2', 'ns3-discovery', 'ns3-discovery-epidemic', 'ns3-sim-ls-periodic', 'ns3-sim-ls-triggered', 'ns3-sim-hsls-periodic', 'ns3-sim-hsls-triggered', 'ns3-emu-ls-periodic', 'ns3-emu-ls-triggered', 'ns3-emu-hsls-periodic', 'ns3-emu-hsls-triggered', 'ns3-dsr', 'ns3-epidemic', 'ns3-chord', 'ns3-mincost-prov', 'ns3-mincost-query', 'ns3-pathvector-prov', 'ns3-pktfwd-prov', 'ns3-secure-pathvector', 'ns3-secure-simple-bgp', 'ns3-secure-pingpong', 'ns3-pktfwd-sdn', 'ns3-pktfwd-sdn-prov', 'ns3-pktfwd-sdn-prov-comp', 'ns3-pktfwd-sdn-prov-comp-static-check', 'ns3-pktfwd-norm', 'ns3-pktfwd-norm-prov', 'ns3-pktfwd-norm-prov-comp-strawman', 'ns3-pktfwd-norm-prov-comp-online', 'ns3-pktfwd-norm-bdfair', 'ns3-pktfwd-norm-bdfair-prov', 'ns3-pktfwd-norm-bdfair-prov-comp-strawman', 'ns3-pktfwd-norm-bdfair-prov-comp-online']
-NS3_MODULE_PATH = ['/usr/lib/gcc/x86_64-linux-gnu/4.9', '/home/harshal/rapidnet-comp/build/debug']
+NS3_MODULE_PATH = ['/usr/lib/gcc/x86_64-linux-gnu/4.6', '/home/harshal/rapidnet-comp/build/debug']
 NS3_OPTIONAL_FEATURES = [('Threading', 'Threading Primitives', True, '<pthread.h> include not detected'), ('RealTime', 'Real Time Simulator', True, 'threading not enabled'), ('EmuNetDevice', 'Emulated Net Device', True, '<netpacket/packet.h> include not detected'), ('GSL', 'GNU Scientific Library (GSL)', False, 'GSL not found'), ('TapBridge', 'Tap Bridge', True, '<linux/if_tun.h> include not detected'), ('GtkConfigStore', 'GtkConfigStore', True, "library 'gtk+-2.0 >= 2.12' not found"), ('XmlIo', 'XmlIo', True, "library 'libxml-2.0 >= 2.7' not found"), ('SqliteDataOutput', 'SQlite stats data output', False, "library 'sqlite3' not found"), ('nsc', 'Network Simulation Cradle', False, 'NSC not found (see option --with-nsc)'), ('crypto', 'crypto library', True, "library 'crypto' not found"), ('gmpxx', 'libgmpxx library', True, "library 'libgmpxx' not found"), ('python', 'Python Bindings', False, 'PyBindGen missing'), ('ENABLE_SUDO', 'Use sudo to set suid bit', False, 'option --enable-sudo not selected'), ('static', 'Static build', False, 'option --enable-static not selected')]
 PKG_CONFIG = '/usr/bin/pkg-config'
 PLATFORM = 'linux2'
@@ -97,7 +97,6 @@ STATICLIB_MARKER = '-Wl,-Bstatic'
 STATICLIB_ST = '-l%s'
 SUDO = '/usr/bin/sudo'
 USE_HIGH_PRECISION_DOUBLE = 0
-VALGRIND = '/usr/bin/valgrind'
 WL_SONAME_SUPPORTED = True
 _VARIANT_ = 'debug'
 cfg_files = ['ns3/core-config.h', 'ns3/simulator-config.h', 'ns3/contrib-config.h']

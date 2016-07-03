@@ -97,6 +97,11 @@ PktfwdNormProvEte::InitDatabase ()
   AddRelationWithKeys (LINKHR, attrdeflist (
     attrdef ("linkhr_attr2", IPV4)));
 
+  AddRelationWithKeys (PROV, attrdeflist (
+    attrdef ("prov_attr2", ID),
+    attrdef ("prov_attr3", ID),
+    attrdef ("prov_attr4", IPV4)));
+
   AddRelationWithKeys (RECVPACKET, attrdeflist (
     attrdef ("recvPacket_attr2", IPV4),
     attrdef ("recvPacket_attr3", IPV4),
@@ -116,9 +121,17 @@ PktfwdNormProvEte::DemuxRecv (Ptr<Tuple> tuple)
     {
       R00Eca1Ins (tuple);
     }
+  if (IsDeleteEvent (tuple, INITPACKET))
+    {
+      R00Eca1Del (tuple);
+    }
   if (IsInsertEvent (tuple, FLOWENTRY))
     {
       R03Eca1Ins (tuple);
+    }
+  if (IsDeleteEvent (tuple, FLOWENTRY))
+    {
+      R03Eca1Del (tuple);
     }
   if (IsRecvEvent (tuple, PACKET))
     {
@@ -210,7 +223,46 @@ PktfwdNormProvEte::R00Eca1Ins (Ptr<Tuple> initPacket)
       "prov_attr3",
       "prov_attr4"));
 
-  SendLocal (result);
+  Insert (result);
+}
+
+void
+PktfwdNormProvEte::R00Eca1Del (Ptr<Tuple> initPacket)
+{
+  RAPIDNET_LOG_INFO ("R00Eca1Del triggered");
+
+  Ptr<Tuple> result = initPacket;
+
+  result->Assign (Assignor::New ("$1",
+    VarExpr::New ("initPacket_attr1")));
+
+  result->Assign (Assignor::New ("VID",
+    FSha1::New (
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          Operation::New (RN_PLUS,
+            Operation::New (RN_PLUS,
+              ValueExpr::New (StrValue::New ("initPacket")),
+              VarExpr::New ("initPacket_attr1")),
+            VarExpr::New ("initPacket_attr2")),
+          VarExpr::New ("initPacket_attr3")),
+        VarExpr::New ("initPacket_attr4")))));
+
+  result->Assign (Assignor::New ("RID",
+    VarExpr::New ("VID")));
+
+  result = result->Project (
+    PROV,
+    strlist ("initPacket_attr1",
+      "VID",
+      "RID",
+      "$1"),
+    strlist ("prov_attr1",
+      "prov_attr2",
+      "prov_attr3",
+      "prov_attr4"));
+
+  Delete (result);
 }
 
 void
@@ -245,7 +297,42 @@ PktfwdNormProvEte::R03Eca1Ins (Ptr<Tuple> flowEntry)
       "prov_attr3",
       "prov_attr4"));
 
-  SendLocal (result);
+  Insert (result);
+}
+
+void
+PktfwdNormProvEte::R03Eca1Del (Ptr<Tuple> flowEntry)
+{
+  RAPIDNET_LOG_INFO ("R03Eca1Del triggered");
+
+  Ptr<Tuple> result = flowEntry;
+
+  result->Assign (Assignor::New ("$1",
+    VarExpr::New ("flowEntry_attr1")));
+
+  result->Assign (Assignor::New ("VID",
+    FSha1::New (
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          ValueExpr::New (StrValue::New ("Node")),
+          VarExpr::New ("flowEntry_attr2")),
+        VarExpr::New ("flowEntry_attr3")))));
+
+  result->Assign (Assignor::New ("RID",
+    VarExpr::New ("VID")));
+
+  result = result->Project (
+    PROV,
+    strlist ("flowEntry_attr1",
+      "VID",
+      "RID",
+      "$1"),
+    strlist ("prov_attr1",
+      "prov_attr2",
+      "prov_attr3",
+      "prov_attr4"));
+
+  Delete (result);
 }
 
 void
@@ -454,7 +541,7 @@ PktfwdNormProvEte::Prov_rs1_5_eca (Ptr<Tuple> epacket)
       "prov_attr3",
       "prov_attr4"));
 
-  SendLocal (result);
+  Insert (result);
 }
 
 void
@@ -886,6 +973,6 @@ PktfwdNormProvEte::Prov_rh2_5_eca (Ptr<Tuple> erecvPacket)
       "prov_attr3",
       "prov_attr4"));
 
-  SendLocal (result);
+  Insert (result);
 }
 

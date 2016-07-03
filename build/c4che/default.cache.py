@@ -1,7 +1,7 @@
 AR = '/usr/bin/ar'
 ARFLAGS = 'rcs'
 CCFLAGS_MACBUNDLE = ['-fPIC']
-CC_VERSION = ('4', '9', '2')
+CC_VERSION = ('4', '6', '3')
 COMPILER_CXX = 'g++'
 CPP = '/usr/bin/cpp'
 CPPPATH_ST = '-I%s'

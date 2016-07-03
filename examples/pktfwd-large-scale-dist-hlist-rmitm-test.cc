@@ -503,9 +503,9 @@ void SchedulePacketTrans(int totalNum, int totalSwcNum, int hostPairs, int packe
   cout<<"SchedulePacket Trans started"<<endl;
   double trigger_time = 4.0000;
   srand(1);
-  hostPairs = 1;
-  int srcArray[] = {0,0,55};
-  int dstArray[] = {36,64,53};
+  //hostPairs = 1;
+  //int srcArray[] = {0,0,55};
+  //int dstArray[] = {36,64,53};
 
   for (int i = 0; i < hostPairs; i++, trigger_time += 0.1)
     {
@@ -516,8 +516,8 @@ void SchedulePacketTrans(int totalNum, int totalSwcNum, int hostPairs, int packe
           dst = (rand() % (totalSwcNum));
         }
       while (dst == src);
-      src = srcArray[i];
-      dst = dstArray[i];
+      //src = srcArray[i];
+      //dst = dstArray[i];
       std::cout << "Communicating pair: (" << src << "," << dst << ")" << endl;
       double insert_time = trigger_time;
       ostringstream ss;
@@ -553,7 +553,7 @@ void SerializeProv(int totalNum, string storePath)
 {
   vector<string> relNames;
   relNames.push_back("ruleExec");
-  //relNames.push_back("prov");
+  relNames.push_back("prov");
 
   for (int i = 0; i < totalNum; i++)
     {
@@ -568,7 +568,7 @@ main (int argc, char *argv[])
   LogComponentEnable("PktfwdNormDistHlistRmitm", LOG_LEVEL_INFO);
   LogComponentEnable("RapidNetApplicationBase", LOG_LEVEL_INFO);
 
-  uint32_t hostPairs = 10;
+  uint32_t hostPairs = 100;
   string storePath = "/localdrive1/harshal/pktfwd_dist_hlist_rmitm_storage/";
   uint32_t packetNum = 10;
 

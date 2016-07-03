@@ -491,9 +491,9 @@ void SchedulePacketTrans(int totalNum, int totalSwcNum, int hostPairs, int packe
   double trigger_time = 4.0000;
   int dataCount = 0;
   srand(1);
-  hostPairs =1;
-  int srcArray[] = {0,0,55};
-  int dstArray[] = {36,64,53};
+  //hostPairs =1;
+  //int srcArray[] = {0,0,55};
+  //int dstArray[] = {36,64,53};
   for (int i = 0; i < hostPairs; i++, trigger_time += 0.1)
     {
       int src = (rand() % (totalSwcNum));
@@ -503,8 +503,8 @@ void SchedulePacketTrans(int totalNum, int totalSwcNum, int hostPairs, int packe
           dst = (rand() % (totalSwcNum));
         }
       while (dst == src);
-      src = srcArray[i];
-      dst = dstArray[i];
+      //src = srcArray[i];
+      //dst = dstArray[i];
       std::cout << "Communicating pair: (" << src << "," << dst << ")" << endl;
       double insert_time = trigger_time;
       ostringstream ss;
@@ -554,9 +554,9 @@ main (int argc, char *argv[])
   LogComponentEnable("PktfwdNormProvCompOnlineEte", LOG_LEVEL_INFO);
   LogComponentEnable("RapidNetApplicationBase", LOG_LEVEL_INFO);
 
-  uint32_t hostPairs = 1;
+  uint32_t hostPairs = 1000;
   string storePath = "/localdrive1/harshal/pktfwd_prov_storage_online_ete/";
-  uint32_t packetNum = 1;
+  uint32_t packetNum = 100;
 
   CommandLine cmd;
   cmd.AddValue("hostPairs", "Number of pairs of communicating hosts", hostPairs);

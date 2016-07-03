@@ -35,6 +35,8 @@
 #include "ns3/ipv4-address.h"
 
 
+
+
 /* Links Connecting Hosts To switches*/
 #define linkhr(host, sw)\
   tuple(PktfwdNormProvEte::LINKHR,\
@@ -64,7 +66,6 @@
 #define insert_packet(host, srcadd, dstadd, data)                            \
   app(host) -> Insert(initpacket(addr(host), addr(srcadd), addr(dstadd), data));
 
-
 /* flow entry */
 #define flowentry(sw, dst, next)		\
   tuple(PktfwdNormProvEte::FLOWENTRY,\
@@ -78,7 +79,6 @@
 #define SWITCH 0
 #define HOST 1
 #define HOSTPERSWC 1 //Warning: This is not changeable under the current routing algorithm
-#define DEFAULT_PKTNUM 20
 
 using namespace std;
 using namespace ns3;
@@ -114,7 +114,7 @@ void Print ()
 {
   PrintRelation (apps, PktfwdNormProvEte::RECVPACKET);
   PrintRelation (apps, PktfwdNormProvEte::RULEEXEC);
-  PrintRelation (apps, PktfwdNormProvEte::PROV);
+  //PrintRelation (apps, PktfwdNormProvEte::PROVHASHTABLE);  
 }
 
 void AddLink(AdjList* nodeArray, int i, int j)
@@ -330,13 +330,13 @@ void InsertLinkTables(AdjList* nodeArray, int totalNum)
           int dst = curNode->nodeID;
           int deviceDst = dst + 1; //Rapidnet's node ID starts from 1
           //if (nodeArray[src].ntype == AdjList::ENDPOINT)
-          //{
-          //insert_linkhr(deviceSrc, deviceDst);
-              //}
+            {
+              //insert_linkhr(deviceSrc, deviceDst);
+            }
             //else
-            //{
+            {
               insert_link(deviceSrc, deviceDst);
-              //}
+            }
 
           curNode = curNode->next;
         }
@@ -366,7 +366,7 @@ void Routing(AdjList* nodeArray, int switchNum, const int* swcToHost, map<int, i
       /*if (nodeArray[dst].ntype != AdjList::STUB)
         {
           continue;
-        }*/
+          }*/
 
       for (int i = 0; i < MAX_NODE_NUM; i++)
         {
@@ -375,7 +375,6 @@ void Routing(AdjList* nodeArray, int switchNum, const int* swcToHost, map<int, i
 
       int hostNode = dst;//swcToHost[dst];
       //Install the flow entry towards the local host
-      cout<<"INSERTING IN "<<dst<<" "<<hostNode<<" "<<hostNode<<endl;
       rtables[dst].insert(std::pair<int, int>(hostNode, hostNode));      
 
       //Breadth-first search
@@ -403,13 +402,12 @@ void Routing(AdjList* nodeArray, int switchNum, const int* swcToHost, map<int, i
               queue.push_back(nodeID);
 
               // Change stub switch address to host address when setting up flow entries
-              cout<<"INSERTING IN "<<nodeID<<" "<<hostNode<<" "<<curNode<<endl;
               rtables[nodeID].insert(std::pair<int, int>(hostNode, curNode));
               nei = nei->next;
             }
         }
     }
-  //std::cout<<"Finished Routing"<<endl;
+  
   delete[] visited;
 }
 
@@ -435,25 +433,15 @@ void PrintRoutingTable(map<int, int> (&rtables)[MAX_NODE_NUM], int switchNum)
 /* We omit the default flow entry here*/
 void SetupFlowTable(map<int, int> rtables[MAX_NODE_NUM], int switchNum)
 {
-  std::cout << "Set up flow tables "<<switchNum << endl;
-  for(int i=0; i < switchNum; i++)
-    {
-      map<int,int>::iterator iter = rtables[i].begin();
-      for(;iter!=rtables[i].end();iter++)
-        {
-          cout<<"Rounting entry for "<<i<<" "<<iter->first<<" "<<iter->second<<endl;
-        }
-    }
+  std::cout << "Set up flow tables" << endl;
   for (int swc = 0; swc < switchNum; swc++)
     {
       int deviceSwc = swc + 1; //Rapidnet's node ID starts from 1
       int tablesize = rtables[swc].size();
-      cout<<"TABLE SIZE FOR "<<swc<<" "<<tablesize<<endl;
+
       map<int, int>::iterator itr;
-      int priority = 1;
       for (itr = rtables[swc].begin();itr != rtables[swc].end();itr++)
         {
-          cout<<"TABLE VALUE "<<itr->first<<" "<<itr->second<<endl;
           int dst = itr->first;
           int deviceDst = dst + 1;
           int next = itr->second;
@@ -500,13 +488,12 @@ void SchedulePacketTrans(int totalNum, int totalSwcNum, int hostPairs, int packe
 
   /* Setup: each host randomly picks another host and 
      send a series of packets to it*/
-  cout<<"SchedulePacket Trans started"<<endl;
   double trigger_time = 4.0000;
+  int dataCount = 0;
   srand(1);
-  hostPairs = 1;
-  int srcArray[] = {0,0,55};
-  int dstArray[] = {36,64,53};
-
+  //hostPairs =1;
+  //int srcArray[] = {0,0,55};
+  //int dstArray[] = {36,64,53};
   for (int i = 0; i < hostPairs; i++, trigger_time += 0.1)
     {
       int src = (rand() % (totalSwcNum));
@@ -516,12 +503,11 @@ void SchedulePacketTrans(int totalNum, int totalSwcNum, int hostPairs, int packe
           dst = (rand() % (totalSwcNum));
         }
       while (dst == src);
-      src = srcArray[i];
-      dst = dstArray[i];
+      //src = srcArray[i];
+      //dst = dstArray[i];
       std::cout << "Communicating pair: (" << src << "," << dst << ")" << endl;
       double insert_time = trigger_time;
       ostringstream ss;
-      int dataCount = 0;
       for (int j = 0;j < packetNum;j++, insert_time += 0.0010, dataCount++)
         {
           ss.str("");
@@ -530,8 +516,6 @@ void SchedulePacketTrans(int totalNum, int totalSwcNum, int hostPairs, int packe
           Simulator::Schedule (Seconds (insert_time), PacketInsertion, src, dst, data);
         }
     }
-  
-  std::cout<<"SchedulePacketTrans Done"<<endl;
 }
 
 void DeleteLinks(AdjList* nodeArray, int totalSwcNum)
@@ -553,7 +537,9 @@ void SerializeProv(int totalNum, string storePath)
 {
   vector<string> relNames;
   relNames.push_back("ruleExec");
-  //relNames.push_back("prov");
+  //relNames.push_back("provHashTable");
+  //relNames.push_back("equiHashTable");
+  relNames.push_back("prov");
 
   for (int i = 0; i < totalNum; i++)
     {
@@ -565,17 +551,17 @@ void SerializeProv(int totalNum, string storePath)
 int
 main (int argc, char *argv[])
 {
-  LogComponentEnable("PktfwdNormProvEte", LOG_LEVEL_INFO);
+  LogComponentEnable("PktfwdNormProvCompOnlineEte", LOG_LEVEL_INFO);
   LogComponentEnable("RapidNetApplicationBase", LOG_LEVEL_INFO);
 
-  uint32_t hostPairs = 1;
+  uint32_t hostPairs = 1000;
   string storePath = "/localdrive1/harshal/pktfwd_prov_storage_nocomp_ete/";
-  uint32_t packetNum = 1;
+  uint32_t packetNum = 100;
 
   CommandLine cmd;
   cmd.AddValue("hostPairs", "Number of pairs of communicating hosts", hostPairs);
   cmd.AddValue("storePath", "The path to the directory for provenance storage", storePath);
-  cmd.AddValue("packetNum", "Number of packets sent between each pair of hosts", packetNum);
+  cmd.AddValue("packetNum", "Number of packets sent between each pair of hosts", packetNum);  
   cmd.Parse(argc, argv);
 
   AdjList* nodeArray = new AdjList[MAX_NODE_NUM];
@@ -590,8 +576,7 @@ main (int argc, char *argv[])
   map<int, int> rtables[MAX_NODE_NUM];
 
   int totalSwcNum = ParseTopology(TOPO_FILE, nodeArray);
-  int totalNum = totalSwcNum;
-  //int totalNum = AddHostNodes(nodeArray, totalSwcNum, HOSTPERSWC, swcToHost);
+  int totalNum = totalSwcNum;//AddHostNodes(nodeArray, totalSwcNum, HOSTPERSWC, swcToHost);
   //  PrintTopology(nodeArray, totalNum);
 
   // Set up flow entry table
@@ -611,7 +596,7 @@ main (int argc, char *argv[])
   SchedulePacketTrans(totalNum, totalSwcNum, hostPairs, packetNum);
 
   /* Create RapidNet apps*/
-  //apps = InitRapidNetApps (totalNum, Create<PktfwdNormProvHelper> ());
+  //apps = InitRapidNetApps (totalNum, Create<PktfwdNormProvCompOnlineHelper> ());
   /* CSMA device model*/
   NodeContainer csmaNodes;
   csmaNodes.Create (totalNum);
@@ -633,12 +618,12 @@ main (int argc, char *argv[])
 
   Ptr<RapidNetApplicationHelper> appHelper = Create<PktfwdNormProvEteHelper> ();
   apps = appHelper->Install (csmaNodes);
-  std::cout<<"HERE BEFORE STARTING NS3"<<endl;
+
   apps.Start (Seconds (0.0));
   apps.Stop (Seconds (500.0));
 
   Simulator::Schedule (Seconds(499.0000), SerializeProv, totalNum, storePath);  
-  Simulator::Schedule(Seconds(500.0000),Print);
+
   Simulator::Run ();
   Simulator::Destroy ();
 
@@ -741,3 +726,4 @@ main (int argc, char *argv[])
 //         }
 //     }
 // }
+

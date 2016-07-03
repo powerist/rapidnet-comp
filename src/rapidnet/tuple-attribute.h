@@ -163,6 +163,10 @@ protected:
     ar.template register_type<ListValue>();
     ar.template register_type<IdValue>();
     ar.template register_type<Ipv4Value>();
+    ar.template register_type<BoolValue>();
+    ar.template register_type<Int32Value>();
+    ar.template register_type<StrValue>();
+    ar.template register_type<RealValue>();
 
     std::cout << "Reach tuple attribute?";    
     ar & boost::serialization::base_object<Object>(*this);

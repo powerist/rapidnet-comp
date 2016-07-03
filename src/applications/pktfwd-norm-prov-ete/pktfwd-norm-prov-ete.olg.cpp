@@ -8,6 +8,7 @@ materialize(flowEntry,infinity,infinity,keys(2)). /*Links between routers and ot
 
 /* Provenance tables*/
 materialize(ruleExec, infinity, infinity, keys(4:list)).
+materialize(prov, infinity, infinity, keys(2:cid,3:cid,4)).
 
 
 
