@@ -25,7 +25,7 @@
 #include "ns3/core-module.h"
 #include "ns3/simulator-module.h"
 #include "ns3/node-module.h"
-#include "ns3/pktfwd-norm-dhlist-layerhs-online.h"
+#include "ns3/pktfwd-norm-dhlist-layerhs-online-module.h"
 #include "ns3/rapidnet-module.h"
 #include "ns3/values-module.h"
 #include "ns3/helper-module.h"
@@ -456,10 +456,10 @@ char genRandom()  // Random string generator function.
 int randomStringLength = 21;
 
 
-string generateRandomString()
+string generateRandomString(int length)
 {
   string ans="";
-  for(int i=0;i<randomStringLength;i++)
+  for(int i=0;i<length;i++)
     {
       ans+=genRandom();
     }
@@ -480,10 +480,10 @@ void SetupProgramID(int switchNum)
 	  if(swc!=destSwc)
 	    {
               
-              string progID = generateRandomString();
+              string progID = generateRandomString(randomStringLength);
               while(generatedID.count(progID) != 0)
                 {
-                  progID = generateRandomString();
+                  progID = generateRandomString(randomStringLength);
                 }
               generatedID[progID] = true;
 	      insert_programID(swc+1,destSwc+1,progID.c_str());
@@ -600,7 +600,7 @@ void SerializeProv(int totalNum, string storePath)
   relNames.push_back("ruleExec");
   relNames.push_back("provHashTable");
   relNames.push_back("equiHashTable");
-  relNames.push_back("recvPacketProv");
+  relNames.push_back("recvPacketQry");
   relNames.push_back("provLink");
   for (int i = 0; i < totalNum; i++)
     {
@@ -616,7 +616,7 @@ main (int argc, char *argv[])
   LogComponentEnable("RapidNetApplicationBase", LOG_LEVEL_INFO);
 
   uint32_t hostPairs = 1000;
-  string storePath = "/localdrive1/harshal/pktfwd_dist_hlist_online_storage/";
+  string storePath = "/localdrive1/harshal/pktfwd_dhlist_layerhs_online_storage/";
   uint32_t packetNum = 100;
 
   CommandLine cmd;
@@ -678,9 +678,8 @@ main (int argc, char *argv[])
   address.SetBase ("10.1.1.0", "255.255.255.0");
   address.Assign (csmaDevices);
 
-  Ptr<RapidNetApplicationHelper> appHelper = Create<PktfwdNormDistHlistOnlineHelper> ();
+  Ptr<RapidNetApplicationHelper> appHelper = Create<PktfwdNormDhlistLayerhsOnlineHelper> ();
   apps = appHelper->Install (csmaNodes);
-
   apps.Start (Seconds (0.0));
   apps.Stop (Seconds (500.0));
 

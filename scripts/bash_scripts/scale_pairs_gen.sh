@@ -4,15 +4,17 @@
 # Argument 3: name of the output file
 # Argument 4: prov file directory
 
+
 DIRECTORY="$4/*"
 
 outputFile=$3
 
-for pairNum in {0..200..20}
+rm -f outputFile
+for pairNum in {0..500..10}
 do
     rm -f $DIRECTORY
     # Run the experiment
-    nohup ./waf --run "$1 --hostPairs=$pairNum --packetNum=$2 --storePath=$4/"
+    ./waf --run "$1 --hostPairs=$pairNum --packetNum=$2 --storePath=$4/ --pathLength=$5 --dataSize=$6" > /dev/null 2>&1
     # Calculate the average size of all files
     count=0
     sum=0

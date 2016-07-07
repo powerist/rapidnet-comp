@@ -28,6 +28,8 @@ all_modules = (
     'applications/packet-sink',
     'applications/udp-echo',
     'applications/myproto',
+    
+    'applications/pktfwd-norm-dhlist-layerhs-online',
 
     'applications/pktfwd-norm-dist-hlist-online',
     'applications/pktfwd-norm-dist-hlist-rmitm',

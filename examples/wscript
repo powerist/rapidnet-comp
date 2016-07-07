@@ -346,3 +346,15 @@ def build(bld):
     
     obj = bld.create_ns3_program('pktfwd-large-scale-dist-hlist-rmitm-bandwidth-test')
     obj.source = 'pktfwd-large-scale-dist-hlist-rmitm-bandwidth-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-large-scale-dhlist-layerhs-online-test')
+    obj.source = 'pktfwd-large-scale-dhlist-layerhs-online-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-norm-large-scale-nocomp-ete-Scaling-test')
+    obj.source = 'pktfwd-norm-large-scale-nocomp-ete-Scaling-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-large-scale-dist-hlist-rmitm-Scaling-test')
+    obj.source = 'pktfwd-large-scale-dist-hlist-rmitm-Scaling-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-large-scale-dhlist-layerhs-online-Scaling-test')
+    obj.source = 'pktfwd-large-scale-dhlist-layerhs-online-Scaling-test.cc'
