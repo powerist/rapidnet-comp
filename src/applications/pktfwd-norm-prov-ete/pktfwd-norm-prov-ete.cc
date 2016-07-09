@@ -125,14 +125,6 @@ PktfwdNormProvEte::DemuxRecv (Ptr<Tuple> tuple)
     {
       R00Eca1Del (tuple);
     }
-  if (IsInsertEvent (tuple, FLOWENTRY))
-    {
-      R03Eca1Ins (tuple);
-    }
-  if (IsDeleteEvent (tuple, FLOWENTRY))
-    {
-      R03Eca1Del (tuple);
-    }
   if (IsRecvEvent (tuple, PACKET))
     {
       Prov_rs1_1_eca (tuple);
@@ -254,76 +246,6 @@ PktfwdNormProvEte::R00Eca1Del (Ptr<Tuple> initPacket)
   result = result->Project (
     PROV,
     strlist ("initPacket_attr1",
-      "VID",
-      "RID",
-      "$1"),
-    strlist ("prov_attr1",
-      "prov_attr2",
-      "prov_attr3",
-      "prov_attr4"));
-
-  Delete (result);
-}
-
-void
-PktfwdNormProvEte::R03Eca1Ins (Ptr<Tuple> flowEntry)
-{
-  RAPIDNET_LOG_INFO ("R03Eca1Ins triggered");
-
-  Ptr<Tuple> result = flowEntry;
-
-  result->Assign (Assignor::New ("$1",
-    VarExpr::New ("flowEntry_attr1")));
-
-  result->Assign (Assignor::New ("VID",
-    FSha1::New (
-      Operation::New (RN_PLUS,
-        Operation::New (RN_PLUS,
-          ValueExpr::New (StrValue::New ("Node")),
-          VarExpr::New ("flowEntry_attr2")),
-        VarExpr::New ("flowEntry_attr3")))));
-
-  result->Assign (Assignor::New ("RID",
-    VarExpr::New ("VID")));
-
-  result = result->Project (
-    PROV,
-    strlist ("flowEntry_attr1",
-      "VID",
-      "RID",
-      "$1"),
-    strlist ("prov_attr1",
-      "prov_attr2",
-      "prov_attr3",
-      "prov_attr4"));
-
-  Insert (result);
-}
-
-void
-PktfwdNormProvEte::R03Eca1Del (Ptr<Tuple> flowEntry)
-{
-  RAPIDNET_LOG_INFO ("R03Eca1Del triggered");
-
-  Ptr<Tuple> result = flowEntry;
-
-  result->Assign (Assignor::New ("$1",
-    VarExpr::New ("flowEntry_attr1")));
-
-  result->Assign (Assignor::New ("VID",
-    FSha1::New (
-      Operation::New (RN_PLUS,
-        Operation::New (RN_PLUS,
-          ValueExpr::New (StrValue::New ("Node")),
-          VarExpr::New ("flowEntry_attr2")),
-        VarExpr::New ("flowEntry_attr3")))));
-
-  result->Assign (Assignor::New ("RID",
-    VarExpr::New ("VID")));
-
-  result = result->Project (
-    PROV,
-    strlist ("flowEntry_attr1",
       "VID",
       "RID",
       "$1"),

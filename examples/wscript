@@ -340,8 +340,8 @@ def build(bld):
     obj.source = 'pktfwd-norm-large-scale-nocomp-ete-bandwidth-test.cc'
 
 
-    obj = bld.create_ns3_program('pktfwd-large-scale-dist-hlist-online-bandwidth-test')
-    obj.source = 'pktfwd-large-scale-dist-hlist-online-bandwidth-test.cc'
+    obj = bld.create_ns3_program('pktfwd-large-scale-dhlist-layerhs-online-bandwidth-test')
+    obj.source = 'pktfwd-large-scale-dhlist-layerhs-online-bandwidth-test.cc'
 
     
     obj = bld.create_ns3_program('pktfwd-large-scale-dist-hlist-rmitm-bandwidth-test')
@@ -358,3 +358,13 @@ def build(bld):
 
     obj = bld.create_ns3_program('pktfwd-large-scale-dhlist-layerhs-online-Scaling-test')
     obj.source = 'pktfwd-large-scale-dhlist-layerhs-online-Scaling-test.cc'
+
+    
+    obj = bld.create_ns3_program('pktfwd-norm-large-scale-nocomp-ete-Storage-vs-Time-test')
+    obj.source = 'pktfwd-norm-large-scale-nocomp-ete-Storage-vs-Time-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-large-scale-dist-hlist-rmitm-Storage-vs-Time-test')
+    obj.source = 'pktfwd-large-scale-dist-hlist-rmitm-Storage-vs-Time-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-large-scale-dhlist-layerhs-online-Storage-vs-Time-test')
+    obj.source = 'pktfwd-large-scale-dhlist-layerhs-online-Storage-vs-Time-test.cc'

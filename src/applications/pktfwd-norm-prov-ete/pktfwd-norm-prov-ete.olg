@@ -24,11 +24,11 @@ r00 prov(@Node, VID, RID, Node) :-
     VID := f_sha1("device" + Device + Dvtype),
     RID := VID.*/
 
-r03 prov(@Node, VID, RID, Node) :-
+/*r03 prov(@Node, VID, RID, Node) :-
     flowEntry(@Node, DstEntry, Next),
     VID := f_sha1("Node" + DstEntry + Next),
     RID := VID.
-
+*/
 
 /*Switch program*/
 /*A hit in the routing table, forward the packet accordingly*/

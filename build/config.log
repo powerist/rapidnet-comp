@@ -1,0 +1,330 @@
+# project ns (3.5) configured on Thu Jul  7 10:13:10 2016 by
+# waf 1.5.8 (abi 7, python 20703f0 on linux2)
+# using ./waf --run pktfwd-norm-large-scale-nocomp-ete-Scaling-test --hostPairs=450 --packetNum=100 --storePath=/localdrive1/harshal/pktfwd_storage_nocomp_pairScaling/ --pathLength=-1 --dataSize=500
+#
+Checking for program g++
+
+find program='g++' paths=[] var='CXX' -> '/usr/bin/g++'
+
+Checking for program cpp
+
+find program='cpp' paths=[] var='CPP' -> '/usr/bin/cpp'
+
+Checking for program ar
+
+find program='ar' paths=[] var='AR' -> '/usr/bin/ar'
+
+Checking for program ranlib
+
+find program='ranlib' paths=[] var='RANLIB' -> '/usr/bin/ranlib'
+
+Checking for g++ 
+
+Checking for program pkg-config
+
+find program='pkg-config' paths=[] var='PKG_CONFIG' -> '/usr/bin/pkg-config'
+
+Checking for regression reference traces 
+
+==>
+#include <stdio.h>
+int main() { return 0; }
+
+<==
+[1/2] cxx: build/.conf_check_0/test.cc -> build/.conf_check_0/testbuild/debug/test_1.o
+['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wno-error=deprecated-declarations', '-Idebug', '-I..', '-D_DEBUG', '-DRUN_SELF_TESTS', '../test.cc', '-c', '-o', 'debug/test_1.o']
+[2/2] cxx_link: build/.conf_check_0/testbuild/debug/test_1.o -> build/.conf_check_0/testbuild/debug/testprog
+['/usr/bin/g++', 'debug/test_1.o', '-o', 'debug/testprog']
+Checking for -Wno-error=deprecated-declarations support
+
+==>
+#include <stdio.h>
+int main() { return 0; }
+
+<==
+[1/2] cxx: build/.conf_check_0/test.cc -> build/.conf_check_0/testbuild/debug/test_1.o
+['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wno-error=deprecated-declarations', '-Wl,--soname=foo', '-Idebug', '-I..', '-D_DEBUG', '-DRUN_SELF_TESTS', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '../test.cc', '-c', '-o', 'debug/test_1.o']
+[2/2] cxx_link: build/.conf_check_0/testbuild/debug/test_1.o -> build/.conf_check_0/testbuild/debug/testprog
+['/usr/bin/g++', 'debug/test_1.o', '-o', 'debug/testprog']
+Checking for -Wl,--soname=foo support
+
+Checking for header stdlib.h
+
+==>
+#include <stdlib.h>
+
+int main() {
+	return 0;
+}
+
+<==
+[1/2] cxx: build/.conf_check_0/test.cpp -> build/.conf_check_0/testbuild/debug/test_1.o
+['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wno-error=deprecated-declarations', '-Idebug', '-I..', '-D_DEBUG', '-DRUN_SELF_TESTS', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '../test.cpp', '-c', '-o', 'debug/test_1.o']
+[2/2] cxx_link: build/.conf_check_0/testbuild/debug/test_1.o -> build/.conf_check_0/testbuild/debug/testprog
+['/usr/bin/g++', 'debug/test_1.o', '-o', 'debug/testprog']
+Checking for header signal.h
+
+==>
+#include <signal.h>
+
+int main() {
+	return 0;
+}
+
+<==
+[1/2] cxx: build/.conf_check_0/test.cpp -> build/.conf_check_0/testbuild/debug/test_1.o
+['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wno-error=deprecated-declarations', '-Idebug', '-I..', '-D_DEBUG', '-DRUN_SELF_TESTS', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '../test.cpp', '-c', '-o', 'debug/test_1.o']
+[2/2] cxx_link: build/.conf_check_0/testbuild/debug/test_1.o -> build/.conf_check_0/testbuild/debug/testprog
+['/usr/bin/g++', 'debug/test_1.o', '-o', 'debug/testprog']
+Checking for header pthread.h
+
+==>
+
+#include <pthread.h>
+int main ()
+{
+   pthread_mutex_t m;
+   pthread_mutex_init (&m, NULL);
+   return 0;
+}
+
+<==
+[1/2] cxx: build/.conf_check_0/test.cpp -> build/.conf_check_0/testbuild/debug/test_1.o
+['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wno-error=deprecated-declarations', '-pthread', '-Idebug', '-I..', '-D_DEBUG', '-DRUN_SELF_TESTS', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '../test.cpp', '-c', '-o', 'debug/test_1.o']
+[2/2] cxx_link: build/.conf_check_0/testbuild/debug/test_1.o -> build/.conf_check_0/testbuild/debug/testprog
+['/usr/bin/g++', 'debug/test_1.o', '-o', 'debug/testprog', '-pthread']
+Checking for high precision time implementation
+
+Checking for header stdint.h
+
+==>
+#include <stdint.h>
+
+int main() {
+	return 0;
+}
+
+<==
+[1/2] cxx: build/.conf_check_0/test.cpp -> build/.conf_check_0/testbuild/debug/test_1.o
+['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wno-error=deprecated-declarations', '-Idebug', '-I..', '-D_DEBUG', '-DRUN_SELF_TESTS', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '../test.cpp', '-c', '-o', 'debug/test_1.o']
+[2/2] cxx_link: build/.conf_check_0/testbuild/debug/test_1.o -> build/.conf_check_0/testbuild/debug/testprog
+['/usr/bin/g++', 'debug/test_1.o', '-o', 'debug/testprog']
+Checking for header inttypes.h
+
+==>
+#include <inttypes.h>
+
+int main() {
+	return 0;
+}
+
+<==
+[1/2] cxx: build/.conf_check_0/test.cpp -> build/.conf_check_0/testbuild/debug/test_1.o
+['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wno-error=deprecated-declarations', '-Idebug', '-I..', '-D_DEBUG', '-DRUN_SELF_TESTS', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '../test.cpp', '-c', '-o', 'debug/test_1.o']
+[2/2] cxx_link: build/.conf_check_0/testbuild/debug/test_1.o -> build/.conf_check_0/testbuild/debug/testprog
+['/usr/bin/g++', 'debug/test_1.o', '-o', 'debug/testprog']
+Checking for header sys/inttypes.h
+
+==>
+#include <sys/inttypes.h>
+
+int main() {
+	return 0;
+}
+
+<==
+[1/2] cxx: build/.conf_check_0/test.cpp -> build/.conf_check_0/testbuild/debug/test_1.o
+../test.cpp:1:26: fatal error: sys/inttypes.h: No such file or directory
+ #include <sys/inttypes.h>
+                          ^
+compilation terminated.
+['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wno-error=deprecated-declarations', '-Idebug', '-I..', '-D_DEBUG', '-DRUN_SELF_TESTS', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '../test.cpp', '-c', '-o', 'debug/test_1.o']
+command returned 'Traceback (most recent call last):\n  File "/home/harshal/rapidnet-comp/.waf-1.5.8-12763e767c863088b8579dbeeb8265b6/wafadmin/Tools/config_c.py", line 345, in run_c_code\n    bld.compile()\n  File "/home/harshal/rapidnet-comp/.waf-1.5.8-12763e767c863088b8579dbeeb8265b6/wafadmin/Build.py", line 154, in compile\n    raise BuildError(self,self.task_manager.tasks_done)\nBuildError: Build failed\n -> task failed (err #1): \n\t{task: cxx test.cpp -> test_1.o}\n'Checking for library rt
+
+==>
+
+int main() {
+	return 0;
+}
+
+<==
+[1/2] cxx: build/.conf_check_0/test.cpp -> build/.conf_check_0/testbuild/debug/test_1.o
+['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wno-error=deprecated-declarations', '-Idebug', '-I..', '-D_DEBUG', '-DRUN_SELF_TESTS', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '../test.cpp', '-c', '-o', 'debug/test_1.o']
+[2/2] cxx_link: build/.conf_check_0/testbuild/debug/test_1.o -> build/.conf_check_0/testbuild/debug/testprog
+['/usr/bin/g++', 'debug/test_1.o', '-o', 'debug/testprog', '-Wl,-Bdynamic', '-lrt']
+Checking for header netpacket/packet.h
+
+==>
+#include <netpacket/packet.h>
+
+int main() {
+	return 0;
+}
+
+<==
+[1/2] cxx: build/.conf_check_0/test.cpp -> build/.conf_check_0/testbuild/debug/test_1.o
+['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wno-error=deprecated-declarations', '-Idebug', '-I..', '-D_DEBUG', '-DRUN_SELF_TESTS', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '../test.cpp', '-c', '-o', 'debug/test_1.o']
+[2/2] cxx_link: build/.conf_check_0/testbuild/debug/test_1.o -> build/.conf_check_0/testbuild/debug/testprog
+['/usr/bin/g++', 'debug/test_1.o', '-o', 'debug/testprog']
+Checking for pkg-config flags for GSL 
+
+['/usr/bin/pkg-config', '--cflags', '--libs', 'gsl']: '' (exit code 1)
+Checking for header linux/if_tun.h
+
+==>
+#include <linux/if_tun.h>
+
+int main() {
+	return 0;
+}
+
+<==
+[1/2] cxx: build/.conf_check_0/test.cpp -> build/.conf_check_0/testbuild/debug/test_1.o
+['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wno-error=deprecated-declarations', '-Idebug', '-I..', '-D_DEBUG', '-DRUN_SELF_TESTS', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '../test.cpp', '-c', '-o', 'debug/test_1.o']
+[2/2] cxx_link: build/.conf_check_0/testbuild/debug/test_1.o -> build/.conf_check_0/testbuild/debug/testprog
+['/usr/bin/g++', 'debug/test_1.o', '-o', 'debug/testprog']
+Checking for pkg-config flags for GTK_CONFIG_STORE 
+
+['/usr/bin/pkg-config', '--cflags', '--libs', 'gtk+-2.0 >= 2.12']: '-pthread -I/usr/include/gtk-2.0 -I/usr/lib/x86_64-linux-gnu/gtk-2.0/include -I/usr/include/atk-1.0 -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/pango-1.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng12  -lgtk-x11-2.0 -lgdk-x11-2.0 -latk-1.0 -lgio-2.0 -lpangoft2-1.0 -lpangocairo-1.0 -lgdk_pixbuf-2.0 -lcairo -lpango-1.0 -lfreetype -lfontconfig -lgobject-2.0 -lglib-2.0  \n' (exit code 0)
+Checking for pkg-config flags for LIBXML2 
+
+['/usr/bin/pkg-config', '--cflags', '--libs', 'libxml-2.0 >= 2.6']: '-I/usr/include/libxml2  -lxml2  \n' (exit code 0)
+Checking for library sqlite3
+
+==>
+
+int main() {
+	return 0;
+}
+
+<==
+[1/2] cxx: build/.conf_check_0/test.cpp -> build/.conf_check_0/testbuild/debug/test_1.o
+['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wno-error=deprecated-declarations', '-Idebug', '-I..', '-D_DEBUG', '-DRUN_SELF_TESTS', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '../test.cpp', '-c', '-o', 'debug/test_1.o']
+[2/2] cxx_link: build/.conf_check_0/testbuild/debug/test_1.o -> build/.conf_check_0/testbuild/debug/testprog
+/usr/bin/ld: cannot find -lsqlite3
+collect2: error: ld returned 1 exit status
+['/usr/bin/g++', 'debug/test_1.o', '-o', 'debug/testprog', '-Wl,-Bdynamic', '-lsqlite3']
+command returned 'Traceback (most recent call last):\n  File "/home/harshal/rapidnet-comp/.waf-1.5.8-12763e767c863088b8579dbeeb8265b6/wafadmin/Tools/config_c.py", line 345, in run_c_code\n    bld.compile()\n  File "/home/harshal/rapidnet-comp/.waf-1.5.8-12763e767c863088b8579dbeeb8265b6/wafadmin/Build.py", line 154, in compile\n    raise BuildError(self,self.task_manager.tasks_done)\nBuildError: Build failed\n -> task failed (err #1): \n\t{task: cxx_link test_1.o -> testprog}\n'Checking for NSC location 
+
+Checking for library crypto
+
+==>
+
+int main() {
+	return 0;
+}
+
+<==
+[1/2] cxx: build/.conf_check_0/test.cpp -> build/.conf_check_0/testbuild/debug/test_1.o
+['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wno-error=deprecated-declarations', '-Idebug', '-I..', '-D_DEBUG', '-DRUN_SELF_TESTS', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '../test.cpp', '-c', '-o', 'debug/test_1.o']
+[2/2] cxx_link: build/.conf_check_0/testbuild/debug/test_1.o -> build/.conf_check_0/testbuild/debug/testprog
+['/usr/bin/g++', 'debug/test_1.o', '-o', 'debug/testprog', '-Wl,-Bdynamic', '-lcrypto']
+Checking for library gmpxx
+
+==>
+
+int main() {
+	return 0;
+}
+
+<==
+[1/2] cxx: build/.conf_check_0/test.cpp -> build/.conf_check_0/testbuild/debug/test_1.o
+['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wno-error=deprecated-declarations', '-Idebug', '-I..', '-D_DEBUG', '-DRUN_SELF_TESTS', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '../test.cpp', '-c', '-o', 'debug/test_1.o']
+[2/2] cxx_link: build/.conf_check_0/testbuild/debug/test_1.o -> build/.conf_check_0/testbuild/debug/testprog
+['/usr/bin/g++', 'debug/test_1.o', '-o', 'debug/testprog', '-Wl,-Bdynamic', '-lgmpxx']
+Checking for program python
+
+find program='python' paths=[] var='PYTHON' -> '/usr/bin/python'
+
+Checking for Python version >= 2.3
+
+Configuration returned from '/usr/bin/python':
+python_prefix = '/usr'
+python_SO = '.so'
+python_SYSLIBS = '-lm'
+python_LDFLAGS = '-Wl,-Bsymbolic-functions -Wl,-z,relro'
+python_SHLIBS = '-lpthread -ldl  -lutil'
+python_LIBDIR = '/usr/lib'
+python_LIBPL = '/usr/lib/python2.7/config'
+INCLUDEPY = '/usr/include/python2.7'
+Py_ENABLE_SHARED = 0
+MACOSX_DEPLOYMENT_TARGET = ''
+
+
+# Trying LIBDIR: ['/usr/lib']
+Checking for library python2.7
+
+==>
+
+int main() {
+	return 0;
+}
+
+<==
+[1/2] cxx: build/.conf_check_0/test.cpp -> build/.conf_check_0/testbuild/debug/test_1.o
+['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wno-error=deprecated-declarations', '-Idebug', '-I..', '-D_DEBUG', '-DRUN_SELF_TESTS', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '../test.cpp', '-c', '-o', 'debug/test_1.o']
+[2/2] cxx_link: build/.conf_check_0/testbuild/debug/test_1.o -> build/.conf_check_0/testbuild/debug/testprog
+['/usr/bin/g++', 'debug/test_1.o', '-o', 'debug/testprog', '-Wl,-Bsymbolic-functions', '-Wl,-z,relro', '-L/usr/lib', '-Wl,-Bdynamic', '-lpython2.7', '-lm', '-lpthread', '-ldl', '-lutil']
+Checking for program python2.7-config
+
+find program='python2.7-config' paths=[] var='PYTHON_CONFIG' -> '/usr/bin/python2.7-config'
+
+Include path for Python extensions (found via python-config --includes): ['/usr/include/python2.7']
+Checking for header Python.h
+
+==>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+	void Py_Initialize(void);
+	void Py_Finalize(void);
+#ifdef __cplusplus
+}
+#endif
+int main()
+{
+   Py_Initialize();
+   Py_Finalize();
+   return 0;
+}
+
+<==
+[1/2] cxx: build/.conf_check_0/test.cpp -> build/.conf_check_0/testbuild/debug/test_1.o
+['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wno-error=deprecated-declarations', '-fno-strict-aliasing', '-Idebug', '-I..', '-I/usr/include/python2.7', '-D_DEBUG', '-DRUN_SELF_TESTS', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '../test.cpp', '-c', '-o', 'debug/test_1.o']
+[2/2] cxx_link: build/.conf_check_0/testbuild/debug/test_1.o -> build/.conf_check_0/testbuild/debug/testprog
+['/usr/bin/g++', 'debug/test_1.o', '-o', 'debug/testprog', '-Wl,-Bsymbolic-functions', '-Wl,-z,relro', '-L/usr/lib', '-Wl,-Bdynamic', '-lm', '-lpthread', '-ldl', '-lutil', '-lpython2.7']
+==>
+#include <stdio.h>
+int main() { return 0; }
+
+<==
+[1/2] cxx: build/.conf_check_0/test.cc -> build/.conf_check_0/testbuild/debug/test_1.o
+['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wno-error=deprecated-declarations', '-fvisibility=hidden', '-Idebug', '-I..', '-D_DEBUG', '-DRUN_SELF_TESTS', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '../test.cc', '-c', '-o', 'debug/test_1.o']
+[2/2] cxx_link: build/.conf_check_0/testbuild/debug/test_1.o -> build/.conf_check_0/testbuild/debug/testprog
+['/usr/bin/g++', 'debug/test_1.o', '-o', 'debug/testprog']
+Checking for -fvisibility=hidden support
+
+Checking for pybindgen location 
+
+Checking for Python module pybindgen
+
+Process ['/usr/bin/python', '-c', 'import pybindgen'] returned exit code 1:
+-- 
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+ImportError: No module named pybindgen
+
+-- 
+Checking for program sudo
+
+find program='sudo' paths=[] var='SUDO' -> '/usr/bin/sudo'
+
+Checking for program hg
+
+find program='hg' paths=[] var='MERCURIAL' -> ''
+
+Checking for program valgrind
+
+find program='valgrind' paths=[] var='VALGRIND' -> '/usr/bin/valgrind'
+

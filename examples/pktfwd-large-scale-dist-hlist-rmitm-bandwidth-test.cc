@@ -90,7 +90,7 @@
 #define BANDWIDTH_LABEL "Avg Bandwidth"
 #define MBPS_UNIT 1000000
 #define KBPS_UNIT 1000
-#define GRAPHIC_PREFIX "/home/harshal/results/prov_dist_rmitm_bandwidth/"
+#define GRAPHIC_PREFIX "/localdrive1/harshal/bandwidth/pktfwd_rmitm_bandwidth_graphics/"
 #define PACKET_INIT_TIME 4.0000
 
 const string plotTitle = "bandwidth usage";
@@ -548,7 +548,7 @@ vector<int> GetPath(int src, int dst, map<int, int> rtables[MAX_NODE_NUM])
 void PrintPathToFile(vector<int>& path)
 {
   std::cout << "Path length: " << path.size() << std::endl;
-  std::ofstream outFile("/home/harshal/results/others/pathFile_rmitm.pt");
+  std::ofstream outFile("/localdrive1/harshal/bandwidth/pathFile_rmitm.pt");
   vector<int>::iterator itr;
   for (itr = path.begin(); itr != path.end(); itr++)
     {
@@ -589,7 +589,7 @@ void PacketInsertion(int src, int dst, string data)
 
 /* Schedule packet transmission*/
 void SchedulePacketTrans(int totalNum, int totalSwcNum, int hostPairs, int packetNum,
-                         map<int,int> rtables[MAX_NODE_NUM],int dataSize)
+                         int pathLength,map<int,int> rtables[MAX_NODE_NUM],int dataSize)
 {
   /* DEFAULT_PKTNUM of packet transmissions between a single pair of nodes */
   // double insert_time = 4.0000;
@@ -614,15 +614,27 @@ void SchedulePacketTrans(int totalNum, int totalSwcNum, int hostPairs, int packe
   //int dstArray[] = {36,64,53};
   for (int i = 0; i < hostPairs; i++, trigger_time += 0.1)
     {
-      int src = (rand() % (totalSwcNum));
-      int dst;
-      do
-        {
-          dst = (rand() % (totalSwcNum));
-        }
-      while (dst == src);
-      //src = srcArray[i];
-      //dst = dstArray[i];
+       int src,dst,length=0;
+        do
+	{
+	  length=0;
+	  src = (rand() % (totalSwcNum));
+	  do
+	    {
+	      dst = (rand() % (totalSwcNum));
+	    }
+	  while (dst == src);
+	  //src = srcArray[i];
+	  //dst = dstArray[i];
+	  //Check if destination is atleast pathLength long
+	  int tempDst = src;
+	  while(tempDst!=dst)
+	    {
+	      tempDst = rtables[tempDst][dst];
+	      length++;
+	    }
+	}
+      while( length != pathLength && pathLength!=-1);
       std::cout << "Communicating pair: (" << src << "," << dst << ")" << endl;
 
       vector<int> path = GetPath(src, dst, rtables);
@@ -642,7 +654,7 @@ void SchedulePacketTrans(int totalNum, int totalSwcNum, int hostPairs, int packe
 
    //Extra functionality: calculate the total number of hops and output to file
   std::ofstream hopCountFile;
-  hopCountFile.open ("/home/harshal/results/hopCount_rmitm.dat", ios::out | ios::app);
+  hopCountFile.open ("/localdrive1/harshal/bandwidth/hopCount_rmitm.dat", ios::out | ios::app);
   hopCountFile << hostPairs << "\t" << totalHops << "\n";
   hopCountFile.close();
   
@@ -749,7 +761,7 @@ main (int argc, char *argv[])
   LogComponentEnable("RapidNetApplicationBase", LOG_LEVEL_INFO);
 
   uint32_t hostPairs = 1000;
-  string storePath = "/localdrive1/harshal/pktfwd_dist_hlist_rmitm_storage/";
+  string storePath = "/localdrive1/harshal/bandwidth/pktfwd_rmitm_storage/";
   uint32_t packetNum = 100;
   
   string graphicName = "bandwidth.pdf";
@@ -757,6 +769,7 @@ main (int argc, char *argv[])
   string bandwidthUnit = "Bps";
 
   uint32_t dataSize = 10;
+  uint32_t pathLength = 10;
   CommandLine cmd;
   cmd.AddValue("hostPairs", "Number of pairs of communicating hosts", hostPairs);
   cmd.AddValue("storePath", "The path to the directory for provenance storage", storePath);
@@ -765,6 +778,7 @@ main (int argc, char *argv[])
   cmd.AddValue("plotFileName", "File name of the plot script", plotFileName);
   cmd.AddValue("bandwidthUnit", "The unit for displaying bandwidth", bandwidthUnit);
   cmd.AddValue("dataSize","The size of packet payload in characters",dataSize);
+  cmd.AddValue("pathLength","Number of hops",pathLength);
   cmd.Parse(argc, argv);
 
   AdjList* nodeArray = new AdjList[MAX_NODE_NUM];
@@ -797,7 +811,7 @@ main (int argc, char *argv[])
   Simulator::Schedule (Seconds(3.0000), SetupFlowTable, rtables, totalSwcNum);  
 
   // Schedule traffic
-  SchedulePacketTrans(totalNum, totalSwcNum, hostPairs, packetNum,rtables,dataSize);
+  SchedulePacketTrans(totalNum, totalSwcNum, hostPairs, packetNum,pathLength,rtables,dataSize);
   
   /* Create RapidNet apps*/
   //apps = InitRapidNetApps (totalNum, Create<PktfwdNormProvCompOnlineHelper> ());
