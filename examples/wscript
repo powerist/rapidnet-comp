@@ -305,7 +305,15 @@ def build(bld):
     obj = bld.create_ns3_program('dns-prov-comp-online-test')
     obj.source = 'dns-prov-comp-online-test.cc'
 
-    
+    obj = bld.create_ns3_program('dns-prov-dist-hlist-rmitm-test')
+    obj.source = 'dns-prov-dist-hlist-rmitm-test.cc'
+
+    obj = bld.create_ns3_program('dns-prov-dhlist-layerhs-online-test')
+    obj.source = 'dns-prov-dhlist-layerhs-online-test.cc'
+
+    obj = bld.create_ns3_program('dns-prov-bandwidth-test')
+    obj.source = 'dns-prov-bandwidth-test.cc'
+
     obj = bld.create_ns3_program('pktfwd-norm-prov-ete-test')
     obj.source = 'pktfwd-norm-prov-ete-test.cc'
 
@@ -358,6 +366,27 @@ def build(bld):
 
     obj = bld.create_ns3_program('pktfwd-large-scale-dhlist-layerhs-online-Scaling-test')
     obj.source = 'pktfwd-large-scale-dhlist-layerhs-online-Scaling-test.cc'
+
+    
+    obj = bld.create_ns3_program('pktfwd-norm-large-scale-nocomp-ete-Pair-Scaling-test')
+    obj.source = 'pktfwd-norm-large-scale-nocomp-ete-Pair-Scaling-test.cc'
+
+    
+    obj = bld.create_ns3_program('pktfwd-large-scale-dist-hlist-rmitm-Pair-Scaling-test')
+    obj.source = 'pktfwd-large-scale-dist-hlist-rmitm-Pair-Scaling-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-large-scale-dhlist-layerhs-online-Pair-Scaling-test')
+    obj.source = 'pktfwd-large-scale-dhlist-layerhs-online-Pair-Scaling-test.cc'
+
+
+    obj = bld.create_ns3_program('pktfwd-norm-large-scale-nocomp-ete-Storage-Rate-vs-Time-test')
+    obj.source = 'pktfwd-norm-large-scale-nocomp-ete-Storage-Rate-vs-Time-test.cc'
+    
+    obj = bld.create_ns3_program('pktfwd-large-scale-dist-hlist-rmitm-Storage-Rate-vs-Time-test')
+    obj.source = 'pktfwd-large-scale-dist-hlist-rmitm-Storage-Rate-vs-Time-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-large-scale-dhlist-layerhs-online-Storage-Rate-vs-Time-test')
+    obj.source = 'pktfwd-large-scale-dhlist-layerhs-online-Storage-Rate-vs-Time-test.cc'
 
     
     obj = bld.create_ns3_program('pktfwd-norm-large-scale-nocomp-ete-Storage-vs-Time-test')

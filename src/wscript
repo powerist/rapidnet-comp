@@ -39,6 +39,9 @@ all_modules = (
     'applications/dns-prov-comp-strawman',
     'applications/dns-prov-comp-online',
     
+    'applications/dns-prov-dhlist-layerhs-online',
+    'applications/dns-prov-dist-hlist-rmitm',
+
     'applications/pktfwd-norm-prov-ete',
     'applications/pktfwd-norm-prov-comp-online-ete',
     'applications/pktfwd-norm-prov-comp-strawman-ete',

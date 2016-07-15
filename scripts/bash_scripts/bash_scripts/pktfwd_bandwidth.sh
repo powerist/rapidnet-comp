@@ -1,0 +1,3 @@
+./waf --run "pktfwd-large-scale-dhlist-layerhs-online-bandwidth-test --hostPairs=500 --packetNum=100 --dataSize=500 --pathLength=-1 --storePath=/localdrive1/harshal/bandwidth/pktfwd_online_storage/" > /dev/null 2>&1
+./waf --run "pktfwd-large-scale-dist-hlist-rmitm-bandwidth-test --hostPairs=500 --packetNum=100 --dataSize=500 --pathLength=-1 --storePath=/localdrive1/harshal/bandwidth/pktfwd_rmitm_storage/" > /dev/null 2>&1
+./waf --run "pktfwd-norm-large-scale-nocomp-ete-bandwidth-test --hostPairs=500 --packetNum=100 --dataSize=500 --pathLength=-1 --storePath=/localdrive1/harshal/bandwidth/pktfwd_nocomp_storage/" > /dev/null 2>&1

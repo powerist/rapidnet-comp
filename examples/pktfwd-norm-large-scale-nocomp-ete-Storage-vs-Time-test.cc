@@ -83,6 +83,8 @@
 #define PACKET_TIME 4
 #define NUM_PACKETS 1000000
 
+#define INSERT_TIME 0.001
+
 using namespace std;
 using namespace ns3;
 using namespace ns3::rapidnet;
@@ -321,9 +323,18 @@ void PrintTopology(AdjList* nodeArray, int totalNum)
 }
 
 
-void InsertLinkTables(AdjList* nodeArray, int totalNum)
+void InsertLinkTables(AdjList* nodeArray, int totalNum, int src, int dst, map<int,int> rtables[MAX_NODE_NUM])
 {
   std::cout << "Insert link tables" << endl;
+   int tempDst = src;
+   while(tempDst != dst)
+    {
+      int tempDstInserted = tempDst+1;
+      int linkDstInserted = rtables[tempDst][dst]+1;
+      insert_link(tempDstInserted,linkDstInserted);
+      tempDst = rtables[tempDst][dst];
+    }
+   /*
   for (int src = 0; src < totalNum; src++)
     {
       int deviceSrc = src + 1; //Rapidnet's node ID starts from 1
@@ -344,7 +355,7 @@ void InsertLinkTables(AdjList* nodeArray, int totalNum)
           curNode = curNode->next;
         }
     }
-
+   */
 }
 
 /* Set up flow tables at each router.
@@ -434,10 +445,19 @@ void PrintRoutingTable(map<int, int> (&rtables)[MAX_NODE_NUM], int switchNum)
 }
 
 /* We omit the default flow entry here*/
-void SetupFlowTable(map<int, int> rtables[MAX_NODE_NUM], int switchNum)
+void SetupFlowTable(map<int, int> rtables[MAX_NODE_NUM], int switchNum, int src, int dst)
 {
   std::cout << "Set up flow tables" << endl;
-  for (int swc = 0; swc < switchNum; swc++)
+  int tempDst = src;
+  while(tempDst != dst)
+    {
+      int tempSrcInserted = tempDst+1;
+      int tempDstInserted = dst+1;
+      int nextInserted = rtables[tempDst][dst]+1;
+      insert_flowentry(tempSrcInserted,tempDstInserted,nextInserted);
+      tempDst = rtables[tempDst][dst];
+    }
+  /*for (int swc = 0; swc < switchNum; swc++)
     {
       int deviceSwc = swc + 1; //Rapidnet's node ID starts from 1
       int tablesize = rtables[swc].size();
@@ -451,7 +471,7 @@ void SetupFlowTable(map<int, int> rtables[MAX_NODE_NUM], int switchNum)
           int deviceNext = next + 1;
           insert_flowentry(deviceSwc, deviceDst, deviceNext);
         }
-    }
+    }*/
 }
 
 /* Insert packets for experiments*/
@@ -506,7 +526,7 @@ string generateRandomString(int length)
 
 /* Schedule packet transmission*/
 void SchedulePacketTrans(int totalNum, int totalSwcNum, int hostPairs, int packetNum, \
-			 int pathLength, map<int, int> rtables[MAX_NODE_NUM],int dataSize)
+			 int pathLength, map<int, int> rtables[MAX_NODE_NUM],int dataSize, int *src, int *dst)
 {
   /* DEFAULT_PKTNUM of packet transmissions between a single pair of nodes */
   // double insert_time = 4.0000;
@@ -530,36 +550,36 @@ void SchedulePacketTrans(int totalNum, int totalSwcNum, int hostPairs, int packe
   //int dstArray[] = {36,64,53};
   for (int i = 0; i < hostPairs; i++, trigger_time += 0.1)
     {
-      int src,dst,length=0;
+      int length=0;
       do
 	{
 	  length=0;
-	  src = (rand() % (totalSwcNum));
+	  *src = (rand() % (totalSwcNum));
 	  do
 	    {
-	      dst = (rand() % (totalSwcNum));
+	      *dst = (rand() % (totalSwcNum));
 	    }
-	  while (dst == src);
+	  while (*dst == *src);
 	  //src = srcArray[i];
 	  //dst = dstArray[i];
 	  //Check if destination is atleast pathLength long
-	  int tempDst = src;
-	  while(tempDst!=dst)
+	  int tempDst = *src;
+	  while(tempDst!=*dst)
 	    {
-	      tempDst = rtables[tempDst][dst];
+	      tempDst = rtables[tempDst][*dst];
 	      length++;
 	    }
 	}
       while( length != pathLength && pathLength!=-1);
-      std::cout << "Communicating pair: (" << src << "," << dst << ")" << endl;
+      std::cout << "Communicating pair: (" << *src << "," << *dst << ")" << endl;
       double insert_time = trigger_time;
       ostringstream ss;
-      for (int j = 0;j < NUM_PACKETS;j++, insert_time += 0.0010, dataCount++)
+      for (unsigned int j = 0;j < packetNum;j++, insert_time += INSERT_TIME, dataCount++)
         {
           ss.str("");
           ss << dataCount;
           string data = generateRandomString(dataSize);
-          Simulator::Schedule (Seconds (insert_time), PacketInsertion, src, dst, data);
+          Simulator::Schedule (Seconds (insert_time), PacketInsertion, *src, *dst, data);
         }
     }
 }
@@ -616,6 +636,7 @@ main (int argc, char *argv[])
   cmd.AddValue("stopTime","Time to stop the experiment",stopTime);
   cmd.Parse(argc, argv);
 
+  
   AdjList* nodeArray = new AdjList[MAX_NODE_NUM];
   int swcToHost[MAX_NODE_NUM];
   for (int i = 0; i < MAX_NODE_NUM; i++)
@@ -635,17 +656,19 @@ main (int argc, char *argv[])
   Routing(nodeArray, totalSwcNum, swcToHost, rtables);
   //  PrintRoutingTable(rtables, totalSwcNum);
 
+   // Schedule traffi
+  int src,dst;
+  packetNum = stopTime/INSERT_TIME;
+  SchedulePacketTrans(totalNum, totalSwcNum, hostPairs, packetNum,pathLength,rtables,dataSize,&src,&dst);
+
   // Insert linking information to the database
-  Simulator::Schedule (Seconds(0.0001), InsertLinkTables, nodeArray, totalNum);  
+  Simulator::Schedule (Seconds(0.0001), InsertLinkTables, nodeArray, totalNum,src,dst,rtables);  
   
   // Assign devices
   //Simulator::Schedule (Seconds(0.0010), SetupDevices, nodeArray, totalNum);
   
   // Assign flow entries
-  Simulator::Schedule (Seconds(3.0000), SetupFlowTable, rtables, totalSwcNum);  
-
-  // Schedule traffic
-  SchedulePacketTrans(totalNum, totalSwcNum, hostPairs, packetNum,pathLength,rtables,dataSize);
+  Simulator::Schedule (Seconds(3.0000), SetupFlowTable, rtables, totalSwcNum,src,dst);  
 
   /* Create RapidNet apps*/
   //apps = InitRapidNetApps (totalNum, Create<PktfwdNormProvCompOnlineHelper> ());
@@ -708,7 +731,7 @@ main (int argc, char *argv[])
 //       queue.pop_front(head);
 
 //       AdjNode* neighbor = nodeArray[curNode].head;
-//       while (neighbor != NULL)
+//       while (neighbor != NUL)
 //         {
 //           int id = neighbor.nodeID;
 //           if (!visited[id])

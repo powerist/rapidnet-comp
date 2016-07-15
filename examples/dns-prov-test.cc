@@ -162,7 +162,10 @@ void get_zipf(float theta, int N, struct probvals *zdist)
     }
 }
 
-void insertRandomURL(list<string> pathList)
+#define INSERT_TIME 2
+#define INSERTION_TIME 0.001
+
+void insertRandomURL(list<string> pathList, int numURL)
 {
   
   
@@ -175,12 +178,9 @@ void insertRandomURL(list<string> pathList)
 
   get_zipf(0.001,pathList.size(),zdist);
 
-  //list<string>::iterator iter = pathList.begin();
-  //int j=0;
-  //for(;j<N;j++)
-  //cout<<zdist[j].cum_prob<<endl;
-  int numURL = 1000;
-  double timer = 0;
+  double timer = INSERT_TIME;
+  map<string,int> urlCounter;
+
   while(numURL > 0)
     {
       double probRand = ((double) rand() / (RAND_MAX));
@@ -191,64 +191,62 @@ void insertRandomURL(list<string> pathList)
 	{
 	  if(zdist[i].cum_prob >= probRand)
 	    {
-	      //cout<<i<<" "<<zdist[i].cum_prob<<" "<<probRand<<endl;
-	      break;
+      	      break;
 	    }
 	}
 
       list<string>::iterator iter = pathList.begin();
-
+      
       for(;iter!=pathList.end();iter++)
 	{
 	  if(i == 0)
 	    {
-	      Simulator::Schedule(Seconds(timer),insertURLTuple,rootNodeID,*iter,resultNodeID,numURL);
-	      //insertURL(rootNodeID,*iter,resultNodeID,numURL);
-	      //delay(1);
+	      int requestID = 0;
+	      if(urlCounter.count(*iter) > 0)
+		requestID = urlCounter[*iter];
+	      else
+		urlCounter[*iter] = -1;
+	      
+	      urlCounter[*iter]++;
+
+	      Simulator::Schedule(Seconds(timer),insertURLTuple,rootNodeID,*iter,resultNodeID,requestID);
 	      break;
 	    }
 	  i--;
 	}
       numURL--;
-      timer+=0.001;
+      timer+=INSERTION_TIME;
     }
     free(zdist);
 }
 
-void UpdateTable()
+void UpdateTable(int minDepth, int maxDepth, int minFanout, int maxFanout, int numRequests)
 {
-  //Final results will be at 1
-   int nextNodeID = 2;
+  int nextNodeID = 2;
   int rootNodeID = 2;
   string path = ".";
   list<string> pathList;
 
-  int minDepth = 9;//atoi(argv[1]);
-  int maxDepth = 10;//atoi(argv[2]);
-		
   int level = rand()%(maxDepth-minDepth)+minDepth;
-  //cout<<"HEIGHT "<<level<<endl;
-  int minFanout = 2;//atoi(argv[3]);
-  int maxFanout = 3;//atoi(argv[4]);
+ 
   generateTree(&nextNodeID,path,&pathList,level,minFanout,maxFanout);
   totalNumNodes = nextNodeID;
-  //cout<<"NUM NODES GENERATED "<<nextNodeID<<endl;
- list<string>::iterator iter = pathList.begin();
+  
+  list<string>::iterator iter = pathList.begin();
   int resultNodeID = 1;
   int counter = 0;
   double timer = 0;
-   for(;counter<50;counter++)
+  /*for(;counter<50;counter++)
     {
       int numRequests = 0;
       for(;numRequests < 10;numRequests++,timer+=0.01)
 	{
 	   Simulator::Schedule(Seconds(timer),insertURLTuple,rootNodeID,*iter,resultNodeID,numRequests);
-	   //timer+=1;
+  
 	}
       iter++;
-      }
-  //insertRandomURL(pathList);
-
+      }*/
+  insertRandomURL(pathList,numRequests);
 }
 
 
@@ -259,7 +257,7 @@ void SerializeProv(string storePath)
   cout<<"STORE PATH "<<storePath<<endl;
   vector<string> relNames;
   relNames.push_back("ruleExec");
-  //relNames.push_back("prov");
+  relNames.push_back("prov");
 
   for (int i = 2; i < totalNumNodes+1; i++)
     {
@@ -278,12 +276,19 @@ int main(int argc,char *argv[])
   
 
   string storePath = "/localdrive1/harshal/prov_test/";
-
+  uint32_t depth = 3;
+  uint32_t fanout = 2;
+  uint32_t stopTime = 6;
+  uint32_t numRequests = 10;
+  
   CommandLine cmd;
   cmd.AddValue("storePth","The path to the directory for provenance storage",storePath);
-
+  cmd.AddValue("depth","Depth of the tree",depth);
+  cmd.AddValue("fanout","Fanout of each node",fanout);
+  cmd.AddValue("stopTime","Stop time of experiment",stopTime);
+  cmd.AddValue("numRequests","Number of Requests",numRequests);
   cmd.Parse(argc,argv);
-
+  
 
   NodeContainer csmaNodes;
   csmaNodes.Create (5000);
@@ -306,14 +311,13 @@ int main(int argc,char *argv[])
   Ptr<RapidNetApplicationHelper> appHelper = Create<DnsProvHelper> ();
   apps = appHelper->Install (csmaNodes);
 
-
+  Simulator::Schedule(Seconds(0.01),UpdateTable,depth,depth+1,fanout,fanout+1,numRequests);
   //apps = InitRapidNetApps (800, Create<DnsProvHelper> ());
   apps.Start (Seconds (0.0));
-  apps.Stop (Seconds (500.0));
-  
-  schedule (0.0, UpdateTable);
-  Simulator::Schedule (Seconds(499.0000), SerializeProv, storePath);
-  schedule (500.0, Print);
+  apps.Stop (Seconds (INSERT_TIME + stopTime));
+ 
+  Simulator::Schedule (Seconds(INSERT_TIME + stopTime -1), SerializeProv, storePath);
+  schedule (INSERT_TIME+stopTime, Print);
   Simulator::Run ();
   cout<<"Total Number Nodes "<<totalNumNodes<<endl;
   Simulator::Destroy ();

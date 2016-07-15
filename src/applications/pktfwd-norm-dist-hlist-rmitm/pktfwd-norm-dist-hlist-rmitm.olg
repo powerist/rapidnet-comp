@@ -28,7 +28,7 @@ prov_rs1_1 epacketTemp(@RLOC, Next, SrcAdd, DstAdd, Data, RID, R, List, PreInfol
 	   PreLoclist := f_append(PreLoc),
 	   PreRIDlist := f_append(PreRID),
 	   PreInfolist := f_concat(PreLoclist, PreRIDlist).
-
+	   
 prov_rs1_2 ruleExec(@RLOC, RID, R, List, PreLoc, PreRID) :- 
 	   epacketTemp(@RLOC, Next, SrcAdd, DstAdd, Data, RID, R, List, PreInfolist),
 	   PreLoc := f_first(PreInfolist),

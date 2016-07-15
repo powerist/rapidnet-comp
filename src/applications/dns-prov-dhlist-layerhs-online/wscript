@@ -1,0 +1,13 @@
+## -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
+
+def build(bld):
+    module = bld.create_ns3_module('dns-prov-dhlist-layerhs-online', ['internet-stack'])
+    module.source = [
+        'dns-prov-dhlist-layerhs-online.cc',
+        ]
+    headers = bld.new_task_gen('ns3header')
+    headers.module = 'dns-prov-dhlist-layerhs-online'
+    headers.source = [
+        'dns-prov-dhlist-layerhs-online.h',
+        'dns-prov-dhlist-layerhs-online-helper.h',
+        ]

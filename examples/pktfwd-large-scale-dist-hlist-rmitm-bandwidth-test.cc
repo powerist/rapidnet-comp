@@ -609,10 +609,15 @@ void SchedulePacketTrans(int totalNum, int totalSwcNum, int hostPairs, int packe
   int totalHops = 0;
   int dataCount = 0;
   srand(1);
+  
+  vector<int> srcVector,dstVector;
+  vector<int> positions;
+  for(int i=0; i< hostPairs; i++)
+    positions.push_back(i);
   //hostPairs =1;
   //int srcArray[] = {0,0,55};
   //int dstArray[] = {36,64,53};
-  for (int i = 0; i < hostPairs; i++, trigger_time += 0.1)
+  for (int i = 0; i < hostPairs; i++)
     {
        int src,dst,length=0;
         do
@@ -636,7 +641,16 @@ void SchedulePacketTrans(int totalNum, int totalSwcNum, int hostPairs, int packe
 	}
       while( length != pathLength && pathLength!=-1);
       std::cout << "Communicating pair: (" << src << "," << dst << ")" << endl;
-
+       srcVector.push_back(src);
+      dstVector.push_back(dst);
+    }
+  srand(unsigned( time(0)));
+  random_shuffle(positions.begin(),positions.end());
+  srand(1);
+  for(vector<int>::iterator iter=positions.begin();iter != positions.end() ; iter++, trigger_time+=0.1)
+    {
+      int src = srcVector[*iter];
+      int dst = dstVector[*iter];
       vector<int> path = GetPath(src, dst, rtables);
       totalHops += path.size ();
       PrintPathToFile(path);
