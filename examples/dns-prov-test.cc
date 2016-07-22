@@ -109,7 +109,41 @@ void generateTree(int *nextNodeID, string currentPath, list<string> *pathList, i
 }
 
 
+void generateRandomTree(int *nextNodeID, string currentPath, list<string>* pathList, int minFanout, int maxFanout, int totalNumNodes)
+{
+  if(totalNumNodes == 1)
+    {
+      (*pathList).push_back(currentPath);
+      return;
+    }
 
+  int fanout = rand()%(maxFanout-minFanout)+minFanout;
+  int *elementCounter = new int[fanout];
+  
+  int rootID = *nextNodeID;
+  for(int i=0; i<fanout;i++)
+    elementCounter[i]=0;
+
+  for(int i=0;i<totalNumNodes-1; i++)
+    {
+      int index = rand()%fanout;
+      elementCounter[index]++;
+    }
+
+  for(int i=0; i <fanout;i++)
+    {
+      if(elementCounter[i]==0)
+	continue;
+      (*nextNodeID)++;
+      // cout<<"Adding at "<<rootID<<" "<<"."<<*nextNodeID<<currentPath<<endl;
+      stringstream newPath;
+      newPath<<"."<<*nextNodeID<<currentPath;	
+      insertNameServer(rootID,newPath.str(),newPath.str()+"server");
+      insertAddressRecord(rootID,newPath.str()+"server",*nextNodeID);
+      generateRandomTree(nextNodeID,newPath.str(),pathList,minFanout,maxFanout,elementCounter[i]);
+    }
+  delete elementCounter;
+}
 
 
 void Print()
@@ -180,7 +214,7 @@ void insertRandomURL(list<string> pathList, int numURL)
 
   double timer = INSERT_TIME;
   map<string,int> urlCounter;
-
+  srand(0);
   while(numURL > 0)
     {
       double probRand = ((double) rand() / (RAND_MAX));
@@ -205,7 +239,7 @@ void insertRandomURL(list<string> pathList, int numURL)
 	      if(urlCounter.count(*iter) > 0)
 		requestID = urlCounter[*iter];
 	      else
-		urlCounter[*iter] = -1;
+		urlCounter[*iter] = 0;
 	      
 	      urlCounter[*iter]++;
 
@@ -231,7 +265,7 @@ void UpdateTable(int minDepth, int maxDepth, int minFanout, int maxFanout, int n
  
   generateTree(&nextNodeID,path,&pathList,level,minFanout,maxFanout);
   totalNumNodes = nextNodeID;
-  
+ 
   list<string>::iterator iter = pathList.begin();
   int resultNodeID = 1;
   int counter = 0;
@@ -246,6 +280,33 @@ void UpdateTable(int minDepth, int maxDepth, int minFanout, int maxFanout, int n
 	}
       iter++;
       }*/
+  insertRandomURL(pathList,numRequests);
+}
+
+
+void UpdateTableRandomTree(int numNodes, int minFanout, int maxFanout, int numRequests)
+{
+  int nextNodeID = 2;
+  int rootNodeID = 2;
+  string path = ".";
+  list<string> pathList;
+ 
+  generateRandomTree(&nextNodeID,path,&pathList,minFanout,maxFanout,numNodes);
+  totalNumNodes = nextNodeID;
+   cout<<"NUMBER OF URL's "<<pathList.size()<<endl;
+  int height = 0;
+  for(list<string>::iterator iter1 = pathList.begin(); iter1 != pathList.end(); iter1++)
+    {
+      if((*iter1).length() > height)
+	{
+	  height = (*iter1).length();
+	}
+    }
+  cout<<"Height of Tree "<<height<<endl;
+  list<string>::iterator iter = pathList.begin();
+  int resultNodeID = 1;
+  int counter = 0;
+  double timer = 0;
   insertRandomURL(pathList,numRequests);
 }
 
@@ -278,15 +339,19 @@ int main(int argc,char *argv[])
   string storePath = "/localdrive1/harshal/prov_test/";
   uint32_t depth = 3;
   uint32_t fanout = 2;
-  uint32_t stopTime = 6;
+  uint32_t stopTime = 500;
   uint32_t numRequests = 10;
-  
+  uint32_t numNodes = -1;
+  uint32_t timedRequests = 0;
+
   CommandLine cmd;
   cmd.AddValue("storePth","The path to the directory for provenance storage",storePath);
   cmd.AddValue("depth","Depth of the tree",depth);
+  cmd.AddValue("numNodes","Number of Nodes",numNodes);
   cmd.AddValue("fanout","Fanout of each node",fanout);
   cmd.AddValue("stopTime","Stop time of experiment",stopTime);
   cmd.AddValue("numRequests","Number of Requests",numRequests);
+  cmd.AddValue("timedRequests","Insert Requests wrt time",timedRequests);
   cmd.Parse(argc,argv);
   
 
@@ -311,7 +376,13 @@ int main(int argc,char *argv[])
   Ptr<RapidNetApplicationHelper> appHelper = Create<DnsProvHelper> ();
   apps = appHelper->Install (csmaNodes);
 
-  Simulator::Schedule(Seconds(0.01),UpdateTable,depth,depth+1,fanout,fanout+1,numRequests);
+  if (stopTime != -1 && timedRequests==1)
+    numRequests=stopTime/INSERTION_TIME;
+
+  if(numNodes == -1)
+    Simulator::Schedule(Seconds(0.01),UpdateTable,depth,depth+1,fanout,fanout+1,numRequests);
+  else
+    Simulator::Schedule(Seconds(0.01),UpdateTableRandomTree,numNodes,fanout,fanout+1,numRequests);
   //apps = InitRapidNetApps (800, Create<DnsProvHelper> ());
   apps.Start (Seconds (0.0));
   apps.Stop (Seconds (INSERT_TIME + stopTime));

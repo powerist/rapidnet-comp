@@ -10,11 +10,12 @@ DIRECTORY="$4/*"
 outputFile=$3
 
 rm -f outputFile
-for pairNum in {0..500..10}
+for pairNum in {0..500..50}
 do
     rm -f $DIRECTORY
     # Run the experiment
-    ./waf --run "$1 --hostPairs=$pairNum --packetNum=$2 --storePath=$4/ --pathLength=$5 --dataSize=$6" > /dev/null 2>&1
+    #nohup ./waf --run "$1 --hostPairs=$pairNum --packetNum=$2 --storePath=$4/ --pathLength=$5 --dataSize=$6"
+    nohup ./waf --run "$1 --hostPairs=$pairNum --packetNum=$2 --storePath=$4/"
     # Calculate the average size of all files
     count=0
     sum=0
@@ -25,6 +26,7 @@ do
 	((count+=1))
     done
     fileNum=$count
-    avg=$((sum/fileNum))
+    avg=$((sum))
+    #/fileNum))
     printf "%s \t %s\n" "$pairNum" "$avg">> "$outputFile"
 done

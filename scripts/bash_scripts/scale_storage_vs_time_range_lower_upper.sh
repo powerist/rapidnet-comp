@@ -10,15 +10,15 @@ DIRECTORY="$4/*"
 outputFile="$3"
 
 rm -f outputFile
-rm -f $4/timer.log
 
-for (( interval=$8;interval<=$9;interval+=$10))
+
+for interval in {80..100..10}
+#( interval=80;interval<=100;interval+=10))
 do
     rm -f $DIRECTORY
     # Run the experiment
     echo "Interval $interval starts at $(date +"%T")" >> "$4/../timer.log"
-    ./waf --run "$1 --hostPairs=$2 --packetNum=$7 --storePath=$4/ --pathLength=$5 --dataSize=$6 --stopTime=$interval" 
-    #> /dev/null 2>&1
+    nohup ./waf --run "$1 --hostPairs=$2 --packetNum=$7 --storePath=$4/ --pathLength=$5 --dataSize=$6 --stopTime=$interval"
     echo "Interval $interval ends at $(date +"%T")" >> "$4/../timer.log"
     # Calculate the average size of all files
     count=0

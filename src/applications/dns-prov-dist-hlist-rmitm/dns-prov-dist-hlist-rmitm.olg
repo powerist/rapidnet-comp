@@ -11,6 +11,10 @@ materialize(prov,infinity,infinity,keys(1,2:cid,3:cid,4)).
 /*Rule r1, Initialize URL tables ar root*/
 prov_r1_1 eRequestTemp(@RLOC,X,URL,HOST,REQUESTID,RID,R,List,PreInfolist) :-
 	   	url(@X,URL,HOST,REQUESTID),
+		name_server(@X,DOMAIN,SERVER),
+	  	address_record(@X,SERVER,ADDR),
+	  	f_indexof(URL,DOMAIN)!=-1,
+	  	URL!=DOMAIN,
 		List := f_empty(),
 		RLOC := X, 
 	   	R := "r1", 

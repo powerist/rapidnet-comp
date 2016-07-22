@@ -314,6 +314,12 @@ def build(bld):
     obj = bld.create_ns3_program('dns-prov-bandwidth-test')
     obj.source = 'dns-prov-bandwidth-test.cc'
 
+    obj = bld.create_ns3_program('dns-prov-dist-hlist-rmitm-bandwidth-test')
+    obj.source = 'dns-prov-dist-hlist-rmitm-bandwidth-test.cc'
+
+    obj = bld.create_ns3_program('dns-prov-dhlist-layerhs-online-bandwidth-test')
+    obj.source = 'dns-prov-dhlist-layerhs-online-bandwidth-test.cc'
+
     obj = bld.create_ns3_program('pktfwd-norm-prov-ete-test')
     obj.source = 'pktfwd-norm-prov-ete-test.cc'
 
@@ -397,3 +403,37 @@ def build(bld):
 
     obj = bld.create_ns3_program('pktfwd-large-scale-dhlist-layerhs-online-Storage-vs-Time-test')
     obj.source = 'pktfwd-large-scale-dhlist-layerhs-online-Storage-vs-Time-test.cc'
+
+
+    obj = bld.create_ns3_program('dns-prov-Scale-Requests-test')
+    obj.source = 'dns-prov-Scale-Requests-test.cc'
+
+    
+    obj = bld.create_ns3_program('dns-prov-dist-hlist-rmitm-Scale-Requests-test')
+    obj.source = 'dns-prov-dist-hlist-rmitm-Scale-Requests-test.cc'
+
+
+    
+    obj = bld.create_ns3_program('dns-prov-dhlist-layerhs-online-Scale-Requests-test')
+    obj.source = 'dns-prov-dhlist-layerhs-online-Scale-Requests-test.cc'
+
+    
+    obj = bld.create_ns3_program('dns-prov-Scale-URLs-test')
+    obj.source = 'dns-prov-Scale-URLs-test.cc'
+
+    
+    obj = bld.create_ns3_program('dns-prov-dist-hlist-rmitm-Scale-URLs-test')
+    obj.source = 'dns-prov-dist-hlist-rmitm-Scale-URLs-test.cc'
+
+    
+    obj = bld.create_ns3_program('dns-prov-dhlist-layerhs-online-Scale-URLs-test')
+    obj.source = 'dns-prov-dhlist-layerhs-online-Scale-URLs-test.cc'
+
+
+    obj = bld.create_ns3_program('pktfwd-norm-prov-enabled-test')
+    obj.source = 'pktfwd-norm-prov-enabled-test.cc'
+
+    
+    obj = bld.create_ns3_program('pktfwd-norm-prov-query-test')
+    obj.source = 'pktfwd-norm-prov-query-test.cc'
+

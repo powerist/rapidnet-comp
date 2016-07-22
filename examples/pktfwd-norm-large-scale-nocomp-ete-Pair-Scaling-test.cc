@@ -526,7 +526,7 @@ void SchedulePacketTrans(int totalNum, int totalSwcNum, int hostPairs, int packe
   //int srcArray[] = {0,0,55};
   //int dstArray[] = {36,64,53};
   int totalPackets = packetNum;
-  int limit = packetNum / hostPairs;
+  int limit = packetNum / hostPairs+1;
   for (int i = 0; i < hostPairs; i++, trigger_time += 0.1)
     {
       

@@ -533,7 +533,7 @@ void PacketInsertion(int src, int dst, string data)
 }
 
 /* Schedule packet transmission*/
-void SchedulePacketTrans(int totalNum, int totalSwcNum, int hostPairs, int packetNum)
+void SchedulePacketTrans(int totalNum, int totalSwcNum, int hostPairs, int packetNum, int dataSize)
 {
   /* DEFAULT_PKTNUM of packet transmissions between a single pair of nodes */
   // double insert_time = 4.0000;
@@ -573,7 +573,7 @@ void SchedulePacketTrans(int totalNum, int totalSwcNum, int hostPairs, int packe
         {
           ss.str("");
           ss << dataCount;
-          string data = ss.str();
+          string data = generateRandomString(dataSize);//ss.str();ss.str();
           Simulator::Schedule (Seconds (insert_time), PacketInsertion, src, dst, data);
         }
     }
@@ -618,11 +618,12 @@ main (int argc, char *argv[])
   uint32_t hostPairs = 1000;
   string storePath = "/localdrive1/harshal/pktfwd_dhlist_layerhs_online_storage/";
   uint32_t packetNum = 100;
-
+  uint32_t dataSize = 500;
   CommandLine cmd;
   cmd.AddValue("hostPairs", "Number of pairs of communicating hosts", hostPairs);
   cmd.AddValue("storePath", "The path to the directory for provenance storage", storePath);
   cmd.AddValue("packetNum", "Number of packets sent between each pair of hosts", packetNum);  
+    cmd.AddValue("dataSize", "Payload Data Size", dataSize);  
   cmd.Parse(argc, argv);
 
   AdjList* nodeArray = new AdjList[MAX_NODE_NUM];
@@ -655,7 +656,7 @@ main (int argc, char *argv[])
   Simulator::Schedule (Seconds(5.0000), SetupProgramID, totalSwcNum);  
 
   // Schedule traffic
-  SchedulePacketTrans(totalNum, totalSwcNum, hostPairs, packetNum);
+  SchedulePacketTrans(totalNum, totalSwcNum, hostPairs, packetNum,dataSize);
 
   /* Create RapidNet apps*/
   //apps = InitRapidNetApps (totalNum, Create<PktfwdNormProvCompOnlineHelper> ());

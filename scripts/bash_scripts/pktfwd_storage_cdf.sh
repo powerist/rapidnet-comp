@@ -1,0 +1,3 @@
+nohup ./waf --run "pktfwd-norm-large-scale-nocomp-ete-test --hostPairs=$1 --packetNum=$2 --storePath=/localdrive1/harshal/storage_cdf/pktfwd_storage_nocomp/"
+nohup ./waf --run "pktfwd-large-scale-dist-hlist-rmitm-test --hostPairs=$1 --packetNum=$2 --storePath=/localdrive1/harshal/storage_cdf/pktfwd_storage_rmitm/"
+nohup ./waf --run "pktfwd-large-scale-dhlist-layerhs-online-test --hostPairs=$1 --packetNum=$2 --storePath=/localdrive1/harshal/storage_cdf/pktfwd_storage_online/"

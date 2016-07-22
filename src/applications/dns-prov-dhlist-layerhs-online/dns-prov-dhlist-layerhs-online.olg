@@ -72,7 +72,8 @@ r1 request(@ADDR,URL,HOST,REQUESTID,PIDHash) :-
 
 /*Hash on equivalence attributes*/
 prov_ri1 urlHash(@X,URL,HOST,REQUESTID,PIDequi,ProgID) :-
-            url(@X,URL,HOST,REQUESTID), 
+            url(@X,URL,HOST,REQUESTID),
+	    /*Remove Program ID */ 
 	    programID(@X,URL,ProgID),
 	    PIDequi := f_sha1(""+X+URL).
 
@@ -96,6 +97,10 @@ r103 request(@X,URL,HOST,REQUESTID,PIDHash) :-
 
 prov_r2_1 eRequestTemp(@RLOC,X,URL,HOST,REQUESTID,RID,R,List,Tag) :-
 		urlCount(@X,URL,HOST,REQUESTID,PIDequi,ProgID,PIDCount),
+		name_server(@X,DOMAIN,SERVER),
+		address_record(@X,SERVER,ADDR),
+	   	f_indexof(URL,DOMAIN)!=-1,
+		URL!=DOMAIN,
 		PIDCount == 0,
 		List := f_empty(),
 	  	RLOC := X,
@@ -106,7 +111,7 @@ prov_r2_1 eRequestTemp(@RLOC,X,URL,HOST,REQUESTID,RID,R,List,Tag) :-
 		Evlist := f_append(PIDev),
 		ProgIDlist := f_append(ProgID),
 	   	InitLhashlist := f_append("NULL"),
-	   	InitProvNode := RLOC,
+	   	InitProvNode := f_sha1("NULL"),
 	   	InitProvNodelist := f_append(InitProvNode),
 	   	InitProvHash := f_sha1("NULL"),
 	   	InitProvHashlist := f_append(InitProvHash),

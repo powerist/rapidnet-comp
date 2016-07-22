@@ -96,6 +96,10 @@ r103 request(@X,URL,HOST,REQUESTID,PIDHash) :-
 
 prov_r2_1 eRequestTemp(@RLOC,X,URL,HOST,REQUESTID,RID,R,List,Tag) :-
   urlCount(@X,URL,HOST,REQUESTID,PIDequi,ProgID,PIDCount),
+  name_server(@X,DOMAIN,SERVER),
+  address_record(@X,SERVER,ADDR),
+     f_indexof(URL,DOMAIN)!=-1,
+  URL!=DOMAIN,
   PIDCount == 0,
   List := f_empty(),
     RLOC := X,

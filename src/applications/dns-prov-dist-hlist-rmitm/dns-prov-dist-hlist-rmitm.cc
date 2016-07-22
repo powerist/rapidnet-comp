@@ -123,6 +123,14 @@ DnsProvDistHlistRmitm::DemuxRecv (Ptr<Tuple> tuple)
     {
       Prov_r1_1Eca0Ins (tuple);
     }
+  if (IsInsertEvent (tuple, NAME_SERVER))
+    {
+      Prov_r1_1Eca1Ins (tuple);
+    }
+  if (IsInsertEvent (tuple, ADDRESS_RECORD))
+    {
+      Prov_r1_1Eca2Ins (tuple);
+    }
   if (IsRecvEvent (tuple, REQUEST))
     {
       Prov_r2_1_eca (tuple);
@@ -166,7 +174,17 @@ DnsProvDistHlistRmitm::Prov_r1_1Eca0Ins (Ptr<Tuple> url)
 {
   RAPIDNET_LOG_INFO ("Prov_r1_1Eca0Ins triggered");
 
-  Ptr<Tuple> result = url;
+  Ptr<RelationBase> result;
+
+  result = GetRelation (NAME_SERVER)->Join (
+    url,
+    strlist ("name_server_attr1"),
+    strlist ("url_attr1"));
+
+  result = GetRelation (ADDRESS_RECORD)->Join (
+    result,
+    strlist ("address_record_attr2", "address_record_attr1"),
+    strlist ("name_server_attr3", "url_attr1"));
 
   result->Assign (Assignor::New ("List",
     FEmpty::New (
@@ -222,10 +240,240 @@ DnsProvDistHlistRmitm::Prov_r1_1Eca0Ins (Ptr<Tuple> url)
       VarExpr::New ("PreLoclist"),
       VarExpr::New ("PreRIDlist"))));
 
+  result = result->Select (Selector::New (
+    Operation::New (RN_NEQ,
+      FIndexOf::New (
+        VarExpr::New ("url_attr2"),
+        VarExpr::New ("name_server_attr2")),
+      ValueExpr::New (Int32Value::New (-1)))));
+
+  result = result->Select (Selector::New (
+    Operation::New (RN_NEQ,
+      VarExpr::New ("url_attr2"),
+      VarExpr::New ("name_server_attr2"))));
+
   result = result->Project (
     EREQUESTTEMP,
     strlist ("RLOC",
       "url_attr1",
+      "url_attr2",
+      "url_attr3",
+      "url_attr4",
+      "RID",
+      "R",
+      "List",
+      "PreInfolist",
+      "RLOC"),
+    strlist ("eRequestTemp_attr1",
+      "eRequestTemp_attr2",
+      "eRequestTemp_attr3",
+      "eRequestTemp_attr4",
+      "eRequestTemp_attr5",
+      "eRequestTemp_attr6",
+      "eRequestTemp_attr7",
+      "eRequestTemp_attr8",
+      "eRequestTemp_attr9",
+      RN_DEST));
+
+  Send (result);
+}
+
+void
+DnsProvDistHlistRmitm::Prov_r1_1Eca1Ins (Ptr<Tuple> name_server)
+{
+  RAPIDNET_LOG_INFO ("Prov_r1_1Eca1Ins triggered");
+
+  Ptr<RelationBase> result;
+
+  result = GetRelation (URL)->Join (
+    name_server,
+    strlist ("url_attr1"),
+    strlist ("name_server_attr1"));
+
+  result = GetRelation (ADDRESS_RECORD)->Join (
+    result,
+    strlist ("address_record_attr2", "address_record_attr1"),
+    strlist ("name_server_attr3", "name_server_attr1"));
+
+  result->Assign (Assignor::New ("List",
+    FEmpty::New (
+)));
+
+  result->Assign (Assignor::New ("RLOC",
+    VarExpr::New ("name_server_attr1")));
+
+  result->Assign (Assignor::New ("R",
+    ValueExpr::New (StrValue::New ("r1"))));
+
+  result->Assign (Assignor::New ("RID",
+    FSha1::New (
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          VarExpr::New ("R"),
+          VarExpr::New ("RLOC")),
+        VarExpr::New ("List")))));
+
+  result->Assign (Assignor::New ("PID2",
+    FSha1::New (
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          Operation::New (RN_PLUS,
+            Operation::New (RN_PLUS,
+              ValueExpr::New (StrValue::New ("url")),
+              VarExpr::New ("name_server_attr1")),
+            VarExpr::New ("url_attr2")),
+          VarExpr::New ("url_attr3")),
+        VarExpr::New ("url_attr4")))));
+
+  result->Assign (Assignor::New ("List",
+    FAppend::New (
+      VarExpr::New ("PID2"))));
+
+  result->Assign (Assignor::New ("PreLoc",
+    VarExpr::New ("name_server_attr1")));
+
+  result->Assign (Assignor::New ("PreLoclist",
+    FAppend::New (
+      VarExpr::New ("PreLoc"))));
+
+  result->Assign (Assignor::New ("PreRID",
+    FSha1::New (
+      ValueExpr::New (StrValue::New ("NULL")))));
+
+  result->Assign (Assignor::New ("PreRIDlist",
+    FAppend::New (
+      VarExpr::New ("PreRID"))));
+
+  result->Assign (Assignor::New ("PreInfolist",
+    FConcat::New (
+      VarExpr::New ("PreLoclist"),
+      VarExpr::New ("PreRIDlist"))));
+
+  result = result->Select (Selector::New (
+    Operation::New (RN_NEQ,
+      FIndexOf::New (
+        VarExpr::New ("url_attr2"),
+        VarExpr::New ("name_server_attr2")),
+      ValueExpr::New (Int32Value::New (-1)))));
+
+  result = result->Select (Selector::New (
+    Operation::New (RN_NEQ,
+      VarExpr::New ("url_attr2"),
+      VarExpr::New ("name_server_attr2"))));
+
+  result = result->Project (
+    EREQUESTTEMP,
+    strlist ("RLOC",
+      "name_server_attr1",
+      "url_attr2",
+      "url_attr3",
+      "url_attr4",
+      "RID",
+      "R",
+      "List",
+      "PreInfolist",
+      "RLOC"),
+    strlist ("eRequestTemp_attr1",
+      "eRequestTemp_attr2",
+      "eRequestTemp_attr3",
+      "eRequestTemp_attr4",
+      "eRequestTemp_attr5",
+      "eRequestTemp_attr6",
+      "eRequestTemp_attr7",
+      "eRequestTemp_attr8",
+      "eRequestTemp_attr9",
+      RN_DEST));
+
+  Send (result);
+}
+
+void
+DnsProvDistHlistRmitm::Prov_r1_1Eca2Ins (Ptr<Tuple> address_record)
+{
+  RAPIDNET_LOG_INFO ("Prov_r1_1Eca2Ins triggered");
+
+  Ptr<RelationBase> result;
+
+  result = GetRelation (URL)->Join (
+    address_record,
+    strlist ("url_attr1"),
+    strlist ("address_record_attr1"));
+
+  result = GetRelation (NAME_SERVER)->Join (
+    result,
+    strlist ("name_server_attr3", "name_server_attr1"),
+    strlist ("address_record_attr2", "address_record_attr1"));
+
+  result->Assign (Assignor::New ("List",
+    FEmpty::New (
+)));
+
+  result->Assign (Assignor::New ("RLOC",
+    VarExpr::New ("address_record_attr1")));
+
+  result->Assign (Assignor::New ("R",
+    ValueExpr::New (StrValue::New ("r1"))));
+
+  result->Assign (Assignor::New ("RID",
+    FSha1::New (
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          VarExpr::New ("R"),
+          VarExpr::New ("RLOC")),
+        VarExpr::New ("List")))));
+
+  result->Assign (Assignor::New ("PID2",
+    FSha1::New (
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          Operation::New (RN_PLUS,
+            Operation::New (RN_PLUS,
+              ValueExpr::New (StrValue::New ("url")),
+              VarExpr::New ("address_record_attr1")),
+            VarExpr::New ("url_attr2")),
+          VarExpr::New ("url_attr3")),
+        VarExpr::New ("url_attr4")))));
+
+  result->Assign (Assignor::New ("List",
+    FAppend::New (
+      VarExpr::New ("PID2"))));
+
+  result->Assign (Assignor::New ("PreLoc",
+    VarExpr::New ("address_record_attr1")));
+
+  result->Assign (Assignor::New ("PreLoclist",
+    FAppend::New (
+      VarExpr::New ("PreLoc"))));
+
+  result->Assign (Assignor::New ("PreRID",
+    FSha1::New (
+      ValueExpr::New (StrValue::New ("NULL")))));
+
+  result->Assign (Assignor::New ("PreRIDlist",
+    FAppend::New (
+      VarExpr::New ("PreRID"))));
+
+  result->Assign (Assignor::New ("PreInfolist",
+    FConcat::New (
+      VarExpr::New ("PreLoclist"),
+      VarExpr::New ("PreRIDlist"))));
+
+  result = result->Select (Selector::New (
+    Operation::New (RN_NEQ,
+      FIndexOf::New (
+        VarExpr::New ("url_attr2"),
+        VarExpr::New ("name_server_attr2")),
+      ValueExpr::New (Int32Value::New (-1)))));
+
+  result = result->Select (Selector::New (
+    Operation::New (RN_NEQ,
+      VarExpr::New ("url_attr2"),
+      VarExpr::New ("name_server_attr2"))));
+
+  result = result->Project (
+    EREQUESTTEMP,
+    strlist ("RLOC",
+      "address_record_attr1",
       "url_attr2",
       "url_attr3",
       "url_attr4",

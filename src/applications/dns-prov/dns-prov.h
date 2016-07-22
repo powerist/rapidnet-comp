@@ -65,6 +65,10 @@ protected:
 
   virtual void Prov_r1_1Eca0Ins (Ptr<Tuple> url);
 
+  virtual void Prov_r1_1Eca1Ins (Ptr<Tuple> name_server);
+
+  virtual void Prov_r1_1Eca2Ins (Ptr<Tuple> address_record);
+
   virtual void Prov_r1_2_eca (Ptr<Tuple> eRequestTemp);
 
   virtual void Prov_r1_3_eca (Ptr<Tuple> eRequestTemp);

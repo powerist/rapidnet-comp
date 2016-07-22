@@ -56,6 +56,10 @@ protected:
 
   virtual void R1Eca0Ins (Ptr<Tuple> url);
 
+  virtual void R1Eca1Ins (Ptr<Tuple> name_server);
+
+  virtual void R1Eca2Ins (Ptr<Tuple> address_record);
+
   virtual void R2_eca (Ptr<Tuple> request);
 
   virtual void R3ECAMat (Ptr<Tuple> r3resultsend);

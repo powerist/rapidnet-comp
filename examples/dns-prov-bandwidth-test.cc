@@ -5,6 +5,8 @@
 #include <map>
 #include <cstring>
 #include <vector>
+#include<algorithm>
+#include<ctime>
 
 #include "ns3/uinteger.h"
 #include "ns3/core-module.h"
@@ -31,7 +33,7 @@
 #define KBPS_UNIT 1000
 
 #define STORAGE_PATH "/localdrive1/harshal/dns/bandwidth/"
-#define GRAPHIC_PREFIX STORAGE_PATH"pktfwd_nocomp_bandwidth_graphics/"
+#define GRAPHIC_PREFIX STORAGE_PATH"dns_nocomp_bandwidth_graphics/"
 
 
 
@@ -104,12 +106,12 @@ void ShowAppAddr(ApplicationContainer& apps, int totalNum)
 {
   std::ofstream ofile("addr_mapping.txt");
   ofile << "\n" << "Mapping: (Node ID -> Application address) " << "\n";
-  for (int i = 0;i < totalNum;i++)
+  for (int i = 1;i <= totalNum+1;i++)
     {
       int nodeID = i;
       ofile << "Node ID: " << nodeID;
       ofile << " -> ";
-      ofile << "App Ipv4ddress: " << app(nodeID+1)->GetAddress ();
+      ofile << "App Ipv4ddress: " << app(nodeID)->GetAddress ();
       ofile << "\n";
     }
   ofile << "\n";
@@ -172,6 +174,25 @@ void Throughput(Gnuplot2dDataset& dataset, int totalNum, int bandw_divisor)
   Simulator::Schedule (Seconds (SAMPLE_INTERVAL), Throughput, dataset, totalNumNodes, bandw_divisor);
 }
 
+void calculateNumNodes(int level, int fanout, int *nextNodeID)
+{
+  if(level > 0)
+	{
+		int i=0;
+		int rootID = *nextNodeID;
+		
+		for(i=0;i<fanout;i++)
+		{
+			(*nextNodeID)++;
+			if(level > 0)
+			{
+
+			  calculateNumNodes(level-1,fanout,nextNodeID);
+			}
+	
+		}
+	}
+} 
 
 void generateTree(int *nextNodeID, string currentPath, list<string> *pathList, int level,\
 			int minFanout, int maxFanout)
@@ -181,7 +202,7 @@ void generateTree(int *nextNodeID, string currentPath, list<string> *pathList, i
 		int fanout = rand()%(maxFanout-minFanout)+minFanout;
 		int i=0;
 		int rootID = *nextNodeID;
-
+		//cout<<"ROOT ID "<<rootID<<endl;
 		for(i=0;i<fanout;i++)
 		{
 			(*nextNodeID)++;
@@ -272,7 +293,7 @@ void insertRandomURL(list<string> pathList, int numURL)
 {
   
   
-  int rootNodeID = 2;
+  int rootNodeID = 1;
   int resultNodeID = 1;
   struct probvals *zdist;
 
@@ -283,7 +304,9 @@ void insertRandomURL(list<string> pathList, int numURL)
 
   double timer = INSERT_TIME;
   map<string,int> urlCounter;
+  srand(0);
 
+  vector<string> urlPermutation;
   while(numURL > 0)
     {
       double probRand = ((double) rand() / (RAND_MAX));
@@ -308,25 +331,36 @@ void insertRandomURL(list<string> pathList, int numURL)
 	      if(urlCounter.count(*iter) > 0)
 		requestID = urlCounter[*iter];
 	      else
-		urlCounter[*iter] = -1;
+		urlCounter[*iter] = 0;
 	      
 	      urlCounter[*iter]++;
 
-	      Simulator::Schedule(Seconds(timer),insertURLTuple,rootNodeID,*iter,resultNodeID,requestID);
+	      urlPermutation.push_back(*iter);
+	      //Simulator::Schedule(Seconds(timer),insertURLTuple,rootNodeID,*iter,resultNodeID,requestID);
 	      break;
 	    }
 	  i--;
 	}
       numURL--;
-      timer+=INSERTION_TIME;
+      //timer+=INSERTION_TIME;
     }
+  int requestCount=0;
+  srand(time(0));
+  random_shuffle(urlPermutation.begin(),urlPermutation.end());
+  for(vector<string>::iterator iter = urlPermutation.begin(); iter!=urlPermutation.end(); iter++)
+    {
+      Simulator::Schedule(Seconds(timer),insertURLTuple,rootNodeID,*iter,resultNodeID,requestCount);
+      timer+=INSERTION_TIME;
+      requestCount++;
+    }
+  srand(0);
     free(zdist);
 }
 
 void UpdateTable(int minDepth, int maxDepth, int minFanout, int maxFanout, int numRequests)
 {
-  int nextNodeID = 2;
-  int rootNodeID = 2;
+  int nextNodeID = 1;
+  int rootNodeID = 1;
   string path = ".";
   list<string> pathList;
 
@@ -352,6 +386,59 @@ void UpdateTable(int minDepth, int maxDepth, int minFanout, int maxFanout, int n
   insertRandomURL(pathList,numRequests);
 }
 
+void generateRandomTree(int *nextNodeID, string currentPath, list<string>* pathList, int minFanout, int maxFanout, int totalNumNodes)
+{
+  if(totalNumNodes == 1)
+    {
+      (*pathList).push_back(currentPath);
+      return;
+    }
+
+  int fanout = rand()%(maxFanout-minFanout)+minFanout;
+  int *elementCounter = new int[fanout];
+  
+  int rootID = *nextNodeID;
+  for(int i=0; i<fanout;i++)
+    elementCounter[i]=0;
+
+  for(int i=0;i<totalNumNodes-1; i++)
+    {
+      int index = rand()%fanout;
+      elementCounter[index]++;
+    }
+
+  for(int i=0; i <fanout;i++)
+    {
+      if(elementCounter[i]==0)
+	continue;
+      (*nextNodeID)++;
+      // cout<<"Adding at "<<rootID<<" "<<"."<<*nextNodeID<<currentPath<<endl;
+      stringstream newPath;
+      newPath<<"."<<*nextNodeID<<currentPath;	
+      insertNameServer(rootID,newPath.str(),newPath.str()+"server");
+      insertAddressRecord(rootID,newPath.str()+"server",*nextNodeID);
+      generateRandomTree(nextNodeID,newPath.str(),pathList,minFanout,maxFanout,elementCounter[i]);
+    }
+  delete elementCounter;
+}
+
+
+void UpdateTableRandomTree(int numNodes, int minFanout, int maxFanout, int numRequests)
+{
+  int nextNodeID = 1;
+  int rootNodeID = 1;
+  string path = ".";
+  list<string> pathList;
+ 
+  generateRandomTree(&nextNodeID,path,&pathList,minFanout,maxFanout,numNodes);
+  totalNumNodes = nextNodeID;
+  
+  list<string>::iterator iter = pathList.begin();
+  int resultNodeID = 1;
+  int counter = 0;
+  double timer = 0;
+  insertRandomURL(pathList,numRequests);
+}
 
 
 void SerializeProv(string storePath)
@@ -362,7 +449,7 @@ void SerializeProv(string storePath)
   relNames.push_back("ruleExec");
   relNames.push_back("prov");
 
-  for (int i = 2; i < totalNumNodes+1; i++)
+  for (int i = 1; i <= totalNumNodes+1; i++)
     {
       int node = i;
       
@@ -382,19 +469,18 @@ void setBandwidthParameters(int *nextNodeID, int currentParent, int level,int fa
 		for(i=0;i<fanout;i++)
 		{
 			(*nextNodeID)++;
-			if(level > 0)
-			{
+			
 			  NodeContainer src = ptpNodes.Get(rootID);
 			  NodeContainer dst = ptpNodes.Get(*nextNodeID);
-			  //cout<<"PAIR "<<rootID<<" "<<*nextNodeID<<endl;
+			  cout<<"PAIR "<<rootID<<" "<<*nextNodeID<<endl;
 			  NodeContainer pair = NodeContainer(src,dst);
 			  NetDeviceContainer ptpDevices;
-			   ptpHelper.SetDeviceAttribute ("DataRate", StringValue ("1Gbps"));
-			   ptpHelper.SetChannelAttribute ("Delay", StringValue ("500ms"));
+			   ptpHelper.SetDeviceAttribute ("DataRate", StringValue ("100Mbps"));
+			   ptpHelper.SetChannelAttribute ("Delay", StringValue ("10ms"));
 			   ptpDevices = ptpHelper.Install (pair);
 			   devices.push_back(ptpDevices);
 			   setBandwidthParameters(nextNodeID,*nextNodeID,level-1, fanout,ptpHelper,devices,ptpNodes);
-			}
+			
 			
 		}
 	}
@@ -431,9 +517,11 @@ int main(int argc,char *argv[])
   string storePath = "/localdrive1/harshal/prov_test/";
   uint32_t depth = 3;
   uint32_t fanout = 2;
-  uint32_t stopTime = 6;
+  uint32_t stopTime = 500;
   uint32_t numRequests = 10;
-  
+  uint32_t numNodes = -1;
+  uint32_t timedRequests = 0;
+
   string graphicName = "bandwidth.pdf";
   string plotFileName = "bandwidth.pl";
   string bandwidthUnit = "Bps";
@@ -441,12 +529,16 @@ int main(int argc,char *argv[])
   CommandLine cmd;
   cmd.AddValue("storePth","The path to the directory for provenance storage",storePath);
   cmd.AddValue("depth","Depth of the tree",depth);
+  cmd.AddValue("numNodes","Number of Nodes",numNodes);
   cmd.AddValue("fanout","Fanout of each node",fanout);
   cmd.AddValue("stopTime","Stop time of experiment",stopTime);
   cmd.AddValue("numRequests","Number of Requests",numRequests);
+  cmd.AddValue("timedRequests","Insert Requests wrt time",timedRequests);
   cmd.Parse(argc,argv);
   
-
+  //calculateNumNodes(depth,fanout,&totalNumNodes);
+  totalNumNodes = numNodes;
+  cout<<"CALCULATE NUM NODES "<<totalNumNodes<<endl;
   /*NodeContainer csmaNodes;
   csmaNodes.Create (5000);
 
@@ -469,14 +561,18 @@ int main(int argc,char *argv[])
   //  apps = appHelper->Install (csmaNodes);
 
   NodeContainer ptpNodes;
-  ptpNodes.Create(5000);
-
+  ptpNodes.Create(500);
   PointToPointHelper ptpHelper;
   std::vector<NetDeviceContainer> devices;
-  int childNodeID = 2;
-  int currentParent =2;
+  int childNodeID = 0;
+  int currentParent =0;
   setBandwidthParameters(&childNodeID,currentParent,depth,fanout, ptpHelper,devices,ptpNodes);
-  Simulator::Schedule(Seconds(2),UpdateTable,depth,depth+1,fanout,fanout+1,numRequests);
+
+    if(numNodes == -1)
+    Simulator::Schedule(Seconds(0.01),UpdateTable,depth,depth+1,fanout,fanout+1,numRequests);
+  else
+    Simulator::Schedule(Seconds(0.01),UpdateTableRandomTree,numNodes,fanout,fanout+1,numRequests);
+    //Simulator::Schedule(Seconds(0.01),UpdateTable,depth,depth+1,fanout,fanout+1,numRequests);
   //apps = InitRapidNetApps (800, Create<DnsProvHelper> ());
    InternetStackHelper stack;
   stack.Install (ptpNodes);
@@ -487,11 +583,12 @@ int main(int argc,char *argv[])
   int mediumNetworkID = 0;
   int highNetworkID = 0;
   int maxSegment = 256;
-  std::cout << devices.size ()<<endl;
+  std::cout <<"DEVICE SIZE "<< devices.size ()<<endl;
   for (itr = devices.begin(); itr != devices.end(); itr++)
   {
     std::ostringstream baseAddr;
     baseAddr << BASE_ADDR << highNetworkID << "."<< lowNetworkID<<".0";
+    
     address.SetBase (baseAddr.str().c_str(), NET_MASK);
     address.Assign (*itr);    
     lowNetworkID++;
@@ -522,6 +619,7 @@ int main(int argc,char *argv[])
   SetMaxJitter (apps, 0);
   
   cout<<"Showing app addresses";
+  
   ShowAppAddr(apps, totalNumNodes);
 
   //apps.Start (Seconds (0.0));

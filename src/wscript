@@ -29,6 +29,7 @@ all_modules = (
     'applications/udp-echo',
     'applications/myproto',
     
+    'applications/pktfwd-norm-prov-enabled',
     'applications/pktfwd-norm-dhlist-layerhs-online',
 
     'applications/pktfwd-norm-dist-hlist-online',
@@ -45,6 +46,8 @@ all_modules = (
     'applications/pktfwd-norm-prov-ete',
     'applications/pktfwd-norm-prov-comp-online-ete',
     'applications/pktfwd-norm-prov-comp-strawman-ete',
+
+    'applications/pktfwd-norm-prov-query',
     
     'routing/olsr',
     'routing/global-routing',

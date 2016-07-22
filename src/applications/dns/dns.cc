@@ -90,12 +90,14 @@ Dns::InitDatabase ()
   AddRelationWithKeys (RESULT, attrdeflist (
     attrdef ("result_attr1", IPV4),
     attrdef ("result_attr2", STR),
-    attrdef ("result_attr3", IPV4)));
+    attrdef ("result_attr3", IPV4),
+    attrdef ("result_attr4", INT32)));
 
   AddRelationWithKeys (URL, attrdeflist (
     attrdef ("url_attr1", IPV4),
     attrdef ("url_attr2", STR),
-    attrdef ("url_attr3", IPV4)));
+    attrdef ("url_attr3", IPV4),
+    attrdef ("url_attr4", INT32)));
 
 }
 
@@ -107,6 +109,14 @@ Dns::DemuxRecv (Ptr<Tuple> tuple)
   if (IsInsertEvent (tuple, URL))
     {
       R1Eca0Ins (tuple);
+    }
+  if (IsInsertEvent (tuple, NAME_SERVER))
+    {
+      R1Eca1Ins (tuple);
+    }
+  if (IsInsertEvent (tuple, ADDRESS_RECORD))
+    {
+      R1Eca2Ins (tuple);
     }
   if (IsRecvEvent (tuple, REQUEST))
     {
@@ -127,18 +137,134 @@ Dns::R1Eca0Ins (Ptr<Tuple> url)
 {
   RAPIDNET_LOG_INFO ("R1Eca0Ins triggered");
 
-  Ptr<Tuple> result = url;
+  Ptr<RelationBase> result;
+
+  result = GetRelation (NAME_SERVER)->Join (
+    url,
+    strlist ("name_server_attr1"),
+    strlist ("url_attr1"));
+
+  result = GetRelation (ADDRESS_RECORD)->Join (
+    result,
+    strlist ("address_record_attr2", "address_record_attr1"),
+    strlist ("name_server_attr3", "url_attr1"));
+
+  result = result->Select (Selector::New (
+    Operation::New (RN_NEQ,
+      FIndexOf::New (
+        VarExpr::New ("url_attr2"),
+        VarExpr::New ("name_server_attr2")),
+      ValueExpr::New (Int32Value::New (-1)))));
+
+  result = result->Select (Selector::New (
+    Operation::New (RN_NEQ,
+      VarExpr::New ("url_attr2"),
+      VarExpr::New ("name_server_attr2"))));
 
   result = result->Project (
     REQUEST,
-    strlist ("url_attr1",
+    strlist ("address_record_attr3",
       "url_attr2",
-      "url_attr3"),
+      "url_attr3",
+      "url_attr4",
+      "address_record_attr3"),
     strlist ("request_attr1",
       "request_attr2",
-      "request_attr3"));
+      "request_attr3",
+      "request_attr4",
+      RN_DEST));
 
-  SendLocal (result);
+  Send (result);
+}
+
+void
+Dns::R1Eca1Ins (Ptr<Tuple> name_server)
+{
+  RAPIDNET_LOG_INFO ("R1Eca1Ins triggered");
+
+  Ptr<RelationBase> result;
+
+  result = GetRelation (URL)->Join (
+    name_server,
+    strlist ("url_attr1"),
+    strlist ("name_server_attr1"));
+
+  result = GetRelation (ADDRESS_RECORD)->Join (
+    result,
+    strlist ("address_record_attr2", "address_record_attr1"),
+    strlist ("name_server_attr3", "name_server_attr1"));
+
+  result = result->Select (Selector::New (
+    Operation::New (RN_NEQ,
+      FIndexOf::New (
+        VarExpr::New ("url_attr2"),
+        VarExpr::New ("name_server_attr2")),
+      ValueExpr::New (Int32Value::New (-1)))));
+
+  result = result->Select (Selector::New (
+    Operation::New (RN_NEQ,
+      VarExpr::New ("url_attr2"),
+      VarExpr::New ("name_server_attr2"))));
+
+  result = result->Project (
+    REQUEST,
+    strlist ("address_record_attr3",
+      "url_attr2",
+      "url_attr3",
+      "url_attr4",
+      "address_record_attr3"),
+    strlist ("request_attr1",
+      "request_attr2",
+      "request_attr3",
+      "request_attr4",
+      RN_DEST));
+
+  Send (result);
+}
+
+void
+Dns::R1Eca2Ins (Ptr<Tuple> address_record)
+{
+  RAPIDNET_LOG_INFO ("R1Eca2Ins triggered");
+
+  Ptr<RelationBase> result;
+
+  result = GetRelation (URL)->Join (
+    address_record,
+    strlist ("url_attr1"),
+    strlist ("address_record_attr1"));
+
+  result = GetRelation (NAME_SERVER)->Join (
+    result,
+    strlist ("name_server_attr3", "name_server_attr1"),
+    strlist ("address_record_attr2", "address_record_attr1"));
+
+  result = result->Select (Selector::New (
+    Operation::New (RN_NEQ,
+      FIndexOf::New (
+        VarExpr::New ("url_attr2"),
+        VarExpr::New ("name_server_attr2")),
+      ValueExpr::New (Int32Value::New (-1)))));
+
+  result = result->Select (Selector::New (
+    Operation::New (RN_NEQ,
+      VarExpr::New ("url_attr2"),
+      VarExpr::New ("name_server_attr2"))));
+
+  result = result->Project (
+    REQUEST,
+    strlist ("address_record_attr3",
+      "url_attr2",
+      "url_attr3",
+      "url_attr4",
+      "address_record_attr3"),
+    strlist ("request_attr1",
+      "request_attr2",
+      "request_attr3",
+      "request_attr4",
+      RN_DEST));
+
+  Send (result);
 }
 
 void
@@ -175,10 +301,12 @@ Dns::R2_eca (Ptr<Tuple> request)
     strlist ("address_record_attr3",
       "request_attr2",
       "request_attr3",
+      "request_attr4",
       "address_record_attr3"),
     strlist ("request_attr1",
       "request_attr2",
       "request_attr3",
+      "request_attr4",
       RN_DEST));
 
   Send (result);
@@ -195,10 +323,12 @@ Dns::R3ECAMat (Ptr<Tuple> r3resultsend)
     RESULT,
     strlist ("r3resultsend_attr1",
       "r3resultsend_attr2",
-      "r3resultsend_attr3"),
+      "r3resultsend_attr3",
+      "r3resultsend_attr4"),
     strlist ("result_attr1",
       "result_attr2",
-      "result_attr3"));
+      "result_attr3",
+      "result_attr4"));
 
   Insert (result);
 }
@@ -237,10 +367,12 @@ Dns::R3_eca (Ptr<Tuple> request)
     strlist ("address_record_attr3",
       "request_attr2",
       "request_attr3",
+      "request_attr4",
       "address_record_attr3"),
     strlist ("r3resultsend_attr1",
       "r3resultsend_attr2",
       "r3resultsend_attr3",
+      "r3resultsend_attr4",
       RN_DEST));
 
   Send (result);

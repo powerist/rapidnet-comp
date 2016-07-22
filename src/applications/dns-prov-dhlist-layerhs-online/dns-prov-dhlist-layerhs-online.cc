@@ -785,7 +785,17 @@ DnsProvDhlistLayerhsOnline::Prov_r2_1_eca (Ptr<Tuple> urlCount)
 {
   RAPIDNET_LOG_INFO ("Prov_r2_1_eca triggered");
 
-  Ptr<Tuple> result = urlCount;
+  Ptr<RelationBase> result;
+
+  result = GetRelation (NAME_SERVER)->Join (
+    urlCount,
+    strlist ("name_server_attr1"),
+    strlist ("urlCount_attr1"));
+
+  result = GetRelation (ADDRESS_RECORD)->Join (
+    result,
+    strlist ("address_record_attr2", "address_record_attr1"),
+    strlist ("name_server_attr3", "urlCount_attr1"));
 
   result->Assign (Assignor::New ("List",
     FEmpty::New (
@@ -870,6 +880,18 @@ DnsProvDhlistLayerhsOnline::Prov_r2_1_eca (Ptr<Tuple> urlCount)
     FConcat::New (
       VarExpr::New ("TempTag4"),
       VarExpr::New ("Equilist"))));
+
+  result = result->Select (Selector::New (
+    Operation::New (RN_NEQ,
+      FIndexOf::New (
+        VarExpr::New ("urlCount_attr2"),
+        VarExpr::New ("name_server_attr2")),
+      ValueExpr::New (Int32Value::New (-1)))));
+
+  result = result->Select (Selector::New (
+    Operation::New (RN_NEQ,
+      VarExpr::New ("urlCount_attr2"),
+      VarExpr::New ("name_server_attr2"))));
 
   result = result->Select (Selector::New (
     Operation::New (RN_EQ,

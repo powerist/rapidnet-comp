@@ -1,0 +1,13 @@
+## -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
+
+def build(bld):
+    module = bld.create_ns3_module('pktfwd-norm-prov-query', ['internet-stack'])
+    module.source = [
+        'pktfwd-norm-prov-query.cc',
+        ]
+    headers = bld.new_task_gen('ns3header')
+    headers.module = 'pktfwd-norm-prov-query'
+    headers.source = [
+        'pktfwd-norm-prov-query.h',
+        'pktfwd-norm-prov-query-helper.h',
+        ]

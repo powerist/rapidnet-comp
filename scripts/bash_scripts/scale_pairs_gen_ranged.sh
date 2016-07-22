@@ -16,7 +16,7 @@ for (( pairNum=1;pairNum<="$7";pairNum+="$8"))
 do
     rm -f $DIRECTORY
     # Run the experiment
-    ./waf --run "$1 --hostPairs=$pairNum --packetNum=$2 --storePath=$4/ --pathLength=$5 --dataSize=$6" > /dev/null 2>&1
+    nohup ./waf --run "$1 --hostPairs=$pairNum --packetNum=$2 --storePath=$4/ --pathLength=$5 --dataSize=$6"
     # Calculate the average size of all files
     count=0
     sum=0

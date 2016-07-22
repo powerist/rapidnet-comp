@@ -483,8 +483,38 @@ void PacketInsertion(int src, int dst, string data)
   //   }
 }
 
+
+char alphanum[] =
+"0123456789"
+"!@#$%^&*"
+"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  "abcdefghijklmnopqrstuvwxyz";
+
+int stringLength = sizeof(alphanum) - 1;
+
+char genRandom()  // Random string generator function.
+{
+  return alphanum[rand() % stringLength];
+}
+
+int randomStringLength = 21;
+
+
+string generateRandomString(int length)
+{
+  string ans="";
+  for(int i=0;i<length;i++)
+    {
+      ans+=genRandom();
+    }
+
+  //cout<<ans<<" Generated"<<endl;
+  return ans;
+}
+
+
 /* Schedule packet transmission*/
-void SchedulePacketTrans(int totalNum, int totalSwcNum, int hostPairs, int packetNum)
+void SchedulePacketTrans(int totalNum, int totalSwcNum, int hostPairs, int packetNum, int dataSize)
 {
   /* DEFAULT_PKTNUM of packet transmissions between a single pair of nodes */
   // double insert_time = 4.0000;
@@ -526,7 +556,7 @@ void SchedulePacketTrans(int totalNum, int totalSwcNum, int hostPairs, int packe
         {
           ss.str("");
           ss << dataCount;
-          string data = ss.str();
+          string data = generateRandomString(dataSize);//ss.str();
           Simulator::Schedule (Seconds (insert_time), PacketInsertion, src, dst, data);
         }
     }
@@ -571,11 +601,12 @@ main (int argc, char *argv[])
   uint32_t hostPairs = 100;
   string storePath = "/localdrive1/harshal/pktfwd_dist_hlist_rmitm_storage/";
   uint32_t packetNum = 10;
-
+  uint32_t dataSize = 500;
   CommandLine cmd;
   cmd.AddValue("hostPairs", "Number of pairs of communicating hosts", hostPairs);
   cmd.AddValue("storePath", "The path to the directory for provenance storage", storePath);
   cmd.AddValue("packetNum", "Number of packets sent between each pair of hosts", packetNum);
+  cmd.AddValue("dataSize", "Payload Data Size", dataSize);  
   cmd.Parse(argc, argv);
 
   AdjList* nodeArray = new AdjList[MAX_NODE_NUM];
@@ -608,7 +639,7 @@ main (int argc, char *argv[])
   Simulator::Schedule (Seconds(3.0000), SetupFlowTable, rtables, totalSwcNum);  
 
   // Schedule traffic
-  SchedulePacketTrans(totalNum, totalSwcNum, hostPairs, packetNum);
+  SchedulePacketTrans(totalNum, totalSwcNum, hostPairs, packetNum, dataSize);
 
   /* Create RapidNet apps*/
   //apps = InitRapidNetApps (totalNum, Create<PktfwdNormProvHelper> ());
