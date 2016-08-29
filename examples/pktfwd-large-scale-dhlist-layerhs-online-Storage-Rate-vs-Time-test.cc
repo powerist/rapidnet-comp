@@ -650,7 +650,7 @@ main (int argc, char *argv[])
   cmd.AddValue("packetNum", "Number of packets sent between each pair of hosts", packetNum);  
   cmd.AddValue("pathLength", "Number of hops", pathLength);  
   cmd.AddValue("dataSize", "Packet Data Size", dataSize);
-  cmd.AddValue("stopTime", "Packet Data Size", stopTime);  
+  cmd.AddValue("stopTime", "Stop Time for the Experiment", stopTime);  
   cmd.Parse(argc, argv);
 
   AdjList* nodeArray = new AdjList[MAX_NODE_NUM];

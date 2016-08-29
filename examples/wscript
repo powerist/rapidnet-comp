@@ -437,3 +437,37 @@ def build(bld):
     obj = bld.create_ns3_program('pktfwd-norm-prov-query-test')
     obj.source = 'pktfwd-norm-prov-query-test.cc'
 
+    
+    obj = bld.create_ns3_program('pktfwd-norm-dist-hlist-rmitm-query-test')
+    obj.source = 'pktfwd-norm-dist-hlist-rmitm-query-test.cc'
+
+    
+    obj = bld.create_ns3_program('pktfwd-norm-dhlist-layerhs-online-query-test')
+    obj.source = 'pktfwd-norm-dhlist-layerhs-online-query-test.cc'
+
+
+    obj = bld.create_ns3_program('pktfwd-check-pathLength-test')
+    obj.source = 'pktfwd-check-pathLength.cc'
+
+    obj = bld.create_ns3_program('pktfwd-norm-prov-query-ptp-test')
+    obj.source = 'pktfwd-norm-prov-query-ptp-test.cc'
+
+    
+    obj = bld.create_ns3_program('pktfwd-norm-dist-hlist-rmitm-query-ptp-test')
+    obj.source = 'pktfwd-norm-dist-hlist-rmitm-query-ptp-test.cc'
+
+    
+    obj = bld.create_ns3_program('pktfwd-norm-dhlist-layerhs-online-query-ptp-test')
+    obj.source = 'pktfwd-norm-dhlist-layerhs-online-query-ptp-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-gen-bandwidth-test')
+    obj.source = 'pktfwd-gen-bandwidth-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-large-scale-test')
+    obj.source = 'pktfwd-large-scale-test.cc'
+
+    obj = bld.create_ns3_program('dns-prov-test')
+    obj.source = 'dns-prov-test.cc'
+
+    obj = bld.create_ns3_program('dns-gen-bandwidth-test')
+    obj.source = 'dns-gen-bandwidth-test.cc'

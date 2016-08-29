@@ -4,6 +4,10 @@
 # Argument 3: name of the output file
 # Argument 4: store path for the output of the experiment
 # Argument 5: path Length
+# Argument 6: Size of the payload
+# Argument 7: Number of packets to be sent
+# Argument 8: Max time for interval
+# Argument 9: Interval length of the experiment
 
 DIRECTORY="$4/*"
 

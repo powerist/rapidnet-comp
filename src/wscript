@@ -48,6 +48,8 @@ all_modules = (
     'applications/pktfwd-norm-prov-comp-strawman-ete',
 
     'applications/pktfwd-norm-prov-query',
+    'applications/pktfwd-norm-dist-hlist-rmitm-query',
+    'applications/pktfwd-norm-dhlist-layerhs-online-query',
     
     'routing/olsr',
     'routing/global-routing',
