@@ -568,6 +568,7 @@ string generateRandomString(int length)
 }
 
 
+#define INSERTION_TIME 6.000
 /* Schedule packet transmission*/
 void SchedulePacketTrans(int totalNum, int totalSwcNum, int hostPairs, int packetNum, int pathLength, map<int, int> rtables[MAX_NODE_NUM],int dataSize, string mode)
 {
@@ -585,7 +586,7 @@ void SchedulePacketTrans(int totalNum, int totalSwcNum, int hostPairs, int packe
 
   /* Setup: each host randomly picks another host and 
      send a series of packets to it*/
-  double trigger_time = 6.0000;
+  double trigger_time = INSERTION_TIME;
   int totalHops = 0;
   int dataCount = 0;
   srand(1);
@@ -722,6 +723,7 @@ main (int argc, char *argv[])
   uint32_t packetNum = 1;
   uint32_t pathLength = -1;
   uint32_t dataSize = 5;
+  uint32_t stopTime = 500;
   string mode = "nocomp";
   CommandLine cmd;
   cmd.AddValue("hostPairs", "Number of pairs of communicating hosts", hostPairs);
@@ -730,6 +732,7 @@ main (int argc, char *argv[])
   cmd.AddValue("dataSize", "Payload Data Size", dataSize);
   cmd.AddValue("pathLength", "Number of hops", pathLength);
   cmd.AddValue("type", "Type of Experiment[nocomp,online,rmitm]", mode);
+  cmd.AddValue("stopTime", "Stop Time for the Experiment", stopTime);
   cmd.Parse(argc, argv);
 
   AdjList* nodeArray = new AdjList[MAX_NODE_NUM];
@@ -797,9 +800,9 @@ main (int argc, char *argv[])
     appHelper = Create<PktfwdNormProvEteHelper>();
   apps = appHelper->Install (csmaNodes);
   apps.Start (Seconds (0.0));
-  apps.Stop (Seconds (500.0));
+  apps.Stop (Seconds (INSERTION_TIME+stopTime));
 
-  Simulator::Schedule (Seconds(499.0000), SerializeProv, totalNum, storePath,mode);  
+  Simulator::Schedule (Seconds(INSERTION_TIME+stopTime-1), SerializeProv, totalNum, storePath,mode);  
 
   Simulator::Run ();
   Simulator::Destroy ();

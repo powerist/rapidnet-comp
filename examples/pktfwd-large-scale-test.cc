@@ -733,6 +733,7 @@ main (int argc, char *argv[])
   cmd.AddValue("pathLength", "Number of hops", pathLength);
   cmd.AddValue("type", "Type of Experiment[nocomp,online,rmitm]", mode);
   cmd.AddValue("stopTime", "Stop Time for the Experiment", stopTime);
+  cmd.AddValue("mode", "Mode of the Experiment", mode);
   cmd.Parse(argc, argv);
 
   AdjList* nodeArray = new AdjList[MAX_NODE_NUM];

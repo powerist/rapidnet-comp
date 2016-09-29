@@ -634,7 +634,7 @@ void SerializeProv(int totalNum, string storePath)
 int
 main (int argc, char *argv[])
 {
-  LogComponentEnable("PktfwdLargeScaleDistHlistOnlineQuery", LOG_LEVEL_ALL);
+  LogComponentEnable("PktfwdNormDhlistLayerhsOnlineQuery", LOG_LEVEL_ALL);
   LogComponentEnable("RapidNetApplicationBase", LOG_LEVEL_ALL);
 
   uint32_t hostPairs = 1000;

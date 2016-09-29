@@ -1,5 +1,5 @@
 #!/bin/bash
-#1;2c Argument 1: name of the test file
+# Argument 1: name of the test file
 # Argument 2: packet number
 # Argument 3: name of the output file
 # Argument 4: store path for the output of the experiment

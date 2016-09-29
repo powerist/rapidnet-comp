@@ -335,7 +335,7 @@ void get_zipf(float theta, int N, struct probvals *zdist)
 /*
   Select URL's based on zipfian distribution
 */
-void insertRandomURL(list<string> pathList, int numURL, string mode)
+void insertRandomURL(list<string> pathList, int numURL, int numRequestsPerURL, string mode)
 {
   
   
@@ -379,8 +379,12 @@ void insertRandomURL(list<string> pathList, int numURL, string mode)
 		urlCounter[*iter] = 0;
 	      
 	      urlCounter[*iter]++;
-
-	      Simulator::Schedule(Seconds(timer),insertURLTuple,rootNodeID,*iter,resultNodeID,requestID,mode);
+	      for(int j=0;j<numRequestsPerURL;j++)
+		{
+		  Simulator::Schedule(Seconds(timer),insertURLTuple,rootNodeID,*iter,resultNodeID,requestID,mode);
+		  requestID = urlCounter[*iter];
+		  urlCounter[*iter]++;
+		}
 	      break;
 	    }
 	  i--;
@@ -391,7 +395,8 @@ void insertRandomURL(list<string> pathList, int numURL, string mode)
     free(zdist);
 }
 //Main function to generate tree and randomly insert the URLs
-void UpdateTable(int minDepth, int maxDepth, int minFanout, int maxFanout, int numRequests)
+int globalNumRequests;
+void UpdateTable(int minDepth, int maxDepth, int minFanout, int maxFanout, int numURL)
 {
   int nextNodeID = 2;
   int rootNodeID = 2;
@@ -408,11 +413,11 @@ void UpdateTable(int minDepth, int maxDepth, int minFanout, int maxFanout, int n
   int counter = 0;
   double timer = 0;
  
-  insertRandomURL(pathList,numRequests,mode);
+  insertRandomURL(pathList,numURL,globalNumRequests,mode);
 }
 
 //Main function to generate tree based on fixed number of nodes
-void UpdateTableRandomTree(int numNodes, int minFanout, int maxFanout, int numRequests, string mode)
+void UpdateTableRandomTree(int numNodes, int minFanout, int maxFanout, int numURL, string mode)
 {
   int nextNodeID = 2;
   int rootNodeID = 2;
@@ -435,7 +440,7 @@ void UpdateTableRandomTree(int numNodes, int minFanout, int maxFanout, int numRe
   int resultNodeID = 1;
   int counter = 0;
   double timer = 0;
-  insertRandomURL(pathList,numRequests,mode);
+  insertRandomURL(pathList,numURL,globalNumRequests,mode);
 }
 
 
@@ -479,7 +484,8 @@ int main(int argc,char *argv[])
   uint32_t depth = 3;
   uint32_t fanout = 2;
   uint32_t stopTime = 500;
-  uint32_t numRequests = 10;
+  uint32_t numRequests = 1;
+  uint32_t numURL=10;
   uint32_t numNodes = -1;
   uint32_t timedRequests = 0;
   string mode = "nocomp";
@@ -490,9 +496,11 @@ int main(int argc,char *argv[])
   cmd.AddValue("fanout","Fanout of each node",fanout);
   cmd.AddValue("stopTime","Stop time of experiment",stopTime);
   cmd.AddValue("type", "Type of Experiment[nocomp,online,rmitm]", mode);
+  cmd.AddValue("numRequests", "Number of Requests per URL", numRequests);
+  cmd.AddValue("numURL", "Number of URL Requests", numURL);
   cmd.Parse(argc,argv);
   
-
+  globalNumRequests=numRequests;
   NodeContainer csmaNodes;
   csmaNodes.Create (5000);
 
