@@ -132,6 +132,14 @@ DnsProv::DemuxRecv (Ptr<Tuple> tuple)
     {
       Prov_r1_1Eca0Ins (tuple);
     }
+  if (IsInsertEvent (tuple, NAME_SERVER))
+    {
+      Prov_r1_1Eca1Ins (tuple);
+    }
+  if (IsInsertEvent (tuple, ADDRESS_RECORD))
+    {
+      Prov_r1_1Eca2Ins (tuple);
+    }
   if (IsRecvEvent (tuple, EREQUESTTEMP))
     {
       Prov_r1_2_eca (tuple);
@@ -257,7 +265,17 @@ DnsProv::Prov_r1_1Eca0Ins (Ptr<Tuple> url)
 {
   RAPIDNET_LOG_INFO ("Prov_r1_1Eca0Ins triggered");
 
-  Ptr<Tuple> result = url;
+  Ptr<RelationBase> result;
+
+  result = GetRelation (NAME_SERVER)->Join (
+    url,
+    strlist ("name_server_attr1"),
+    strlist ("url_attr1"));
+
+  result = GetRelation (ADDRESS_RECORD)->Join (
+    result,
+    strlist ("address_record_attr2", "address_record_attr1"),
+    strlist ("name_server_attr3", "url_attr1"));
 
   result->Assign (Assignor::New ("PID1",
     FSha1::New (
@@ -289,10 +307,188 @@ DnsProv::Prov_r1_1Eca0Ins (Ptr<Tuple> url)
           VarExpr::New ("RLOC")),
         VarExpr::New ("List")))));
 
+  result = result->Select (Selector::New (
+    Operation::New (RN_NEQ,
+      FIndexOf::New (
+        VarExpr::New ("url_attr2"),
+        VarExpr::New ("name_server_attr2")),
+      ValueExpr::New (Int32Value::New (-1)))));
+
+  result = result->Select (Selector::New (
+    Operation::New (RN_NEQ,
+      VarExpr::New ("url_attr2"),
+      VarExpr::New ("name_server_attr2"))));
+
   result = result->Project (
     EREQUESTTEMP,
     strlist ("RLOC",
-      "url_attr1",
+      "address_record_attr3",
+      "url_attr2",
+      "url_attr3",
+      "url_attr4",
+      "RID",
+      "R",
+      "List",
+      "RLOC"),
+    strlist ("eRequestTemp_attr1",
+      "eRequestTemp_attr2",
+      "eRequestTemp_attr3",
+      "eRequestTemp_attr4",
+      "eRequestTemp_attr5",
+      "eRequestTemp_attr6",
+      "eRequestTemp_attr7",
+      "eRequestTemp_attr8",
+      RN_DEST));
+
+  Send (result);
+}
+
+void
+DnsProv::Prov_r1_1Eca1Ins (Ptr<Tuple> name_server)
+{
+  RAPIDNET_LOG_INFO ("Prov_r1_1Eca1Ins triggered");
+
+  Ptr<RelationBase> result;
+
+  result = GetRelation (URL)->Join (
+    name_server,
+    strlist ("url_attr1"),
+    strlist ("name_server_attr1"));
+
+  result = GetRelation (ADDRESS_RECORD)->Join (
+    result,
+    strlist ("address_record_attr2", "address_record_attr1"),
+    strlist ("name_server_attr3", "name_server_attr1"));
+
+  result->Assign (Assignor::New ("PID1",
+    FSha1::New (
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          Operation::New (RN_PLUS,
+            Operation::New (RN_PLUS,
+              ValueExpr::New (StrValue::New ("url")),
+              VarExpr::New ("name_server_attr1")),
+            VarExpr::New ("url_attr2")),
+          VarExpr::New ("url_attr3")),
+        VarExpr::New ("url_attr4")))));
+
+  result->Assign (Assignor::New ("List",
+    FAppend::New (
+      VarExpr::New ("PID1"))));
+
+  result->Assign (Assignor::New ("RLOC",
+    VarExpr::New ("name_server_attr1")));
+
+  result->Assign (Assignor::New ("R",
+    ValueExpr::New (StrValue::New ("rs1"))));
+
+  result->Assign (Assignor::New ("RID",
+    FSha1::New (
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          VarExpr::New ("R"),
+          VarExpr::New ("RLOC")),
+        VarExpr::New ("List")))));
+
+  result = result->Select (Selector::New (
+    Operation::New (RN_NEQ,
+      FIndexOf::New (
+        VarExpr::New ("url_attr2"),
+        VarExpr::New ("name_server_attr2")),
+      ValueExpr::New (Int32Value::New (-1)))));
+
+  result = result->Select (Selector::New (
+    Operation::New (RN_NEQ,
+      VarExpr::New ("url_attr2"),
+      VarExpr::New ("name_server_attr2"))));
+
+  result = result->Project (
+    EREQUESTTEMP,
+    strlist ("RLOC",
+      "address_record_attr3",
+      "url_attr2",
+      "url_attr3",
+      "url_attr4",
+      "RID",
+      "R",
+      "List",
+      "RLOC"),
+    strlist ("eRequestTemp_attr1",
+      "eRequestTemp_attr2",
+      "eRequestTemp_attr3",
+      "eRequestTemp_attr4",
+      "eRequestTemp_attr5",
+      "eRequestTemp_attr6",
+      "eRequestTemp_attr7",
+      "eRequestTemp_attr8",
+      RN_DEST));
+
+  Send (result);
+}
+
+void
+DnsProv::Prov_r1_1Eca2Ins (Ptr<Tuple> address_record)
+{
+  RAPIDNET_LOG_INFO ("Prov_r1_1Eca2Ins triggered");
+
+  Ptr<RelationBase> result;
+
+  result = GetRelation (URL)->Join (
+    address_record,
+    strlist ("url_attr1"),
+    strlist ("address_record_attr1"));
+
+  result = GetRelation (NAME_SERVER)->Join (
+    result,
+    strlist ("name_server_attr3", "name_server_attr1"),
+    strlist ("address_record_attr2", "address_record_attr1"));
+
+  result->Assign (Assignor::New ("PID1",
+    FSha1::New (
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          Operation::New (RN_PLUS,
+            Operation::New (RN_PLUS,
+              ValueExpr::New (StrValue::New ("url")),
+              VarExpr::New ("address_record_attr1")),
+            VarExpr::New ("url_attr2")),
+          VarExpr::New ("url_attr3")),
+        VarExpr::New ("url_attr4")))));
+
+  result->Assign (Assignor::New ("List",
+    FAppend::New (
+      VarExpr::New ("PID1"))));
+
+  result->Assign (Assignor::New ("RLOC",
+    VarExpr::New ("address_record_attr1")));
+
+  result->Assign (Assignor::New ("R",
+    ValueExpr::New (StrValue::New ("rs1"))));
+
+  result->Assign (Assignor::New ("RID",
+    FSha1::New (
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          VarExpr::New ("R"),
+          VarExpr::New ("RLOC")),
+        VarExpr::New ("List")))));
+
+  result = result->Select (Selector::New (
+    Operation::New (RN_NEQ,
+      FIndexOf::New (
+        VarExpr::New ("url_attr2"),
+        VarExpr::New ("name_server_attr2")),
+      ValueExpr::New (Int32Value::New (-1)))));
+
+  result = result->Select (Selector::New (
+    Operation::New (RN_NEQ,
+      VarExpr::New ("url_attr2"),
+      VarExpr::New ("name_server_attr2"))));
+
+  result = result->Project (
+    EREQUESTTEMP,
+    strlist ("RLOC",
+      "address_record_attr3",
       "url_attr2",
       "url_attr3",
       "url_attr4",

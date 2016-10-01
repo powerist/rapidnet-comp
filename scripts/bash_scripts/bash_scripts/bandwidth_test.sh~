@@ -1,0 +1,1 @@
+./waf --run "pktfwd-large-scale-dist-hlist-rmitm-bandwidth-test --hostPairs=50 --packetNum=30 --storePath=../results/prov_storage_pktfwd_dist_hlist_rmitm/ --dataSize=40" > pktfwd_dist_rmitm_bandwidth_test.txt 2>&1

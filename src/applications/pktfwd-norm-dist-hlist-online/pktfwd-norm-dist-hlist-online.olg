@@ -15,7 +15,7 @@ materialize(programID,infinity,infinity,keys(2)). /*Allow the user to specify pr
 materialize(ruleExec, infinity, infinity, keys(2:cid)).
 materialize(provLink, infinity, infinity, keys(2:cid,3:int32,4,5:cid,6:int32)).
 materialize(equiHashTable,infinity,infinity,keys(2)). /*Hash table for equivalence detection*/
-materialize(provHashTable,infinity,infinity,keys(3:list)). /*Hash table for provenance query*/
+materialize(provHashTable,infinity,infinity,keys(3:str)). /*Hash table for provenance query*/
 materialize(recvPacketProv, infinity, infinity, keys(2:cid))./*Provenance-queryable recv packet*/
 
 /* 'ID' is a keyword. Parse error on using id for type!
@@ -53,7 +53,7 @@ prov_rs1_4 provLink(@RLOC, RID, CurCount, Preloc, PreRID, PreCount) :-
 	   PreCount := f_first(Tag),
 	   CurCount := PreCount + 1,
 	   TempTag1 := f_removeFirst(Tag),
-	   Preloc := f_first(TempTag),
+	   Preloc := f_first(TempTag1),
 	   TempTag2 := f_removeFirst(TempTag1),
 	   PreRID := f_first(TempTag2).
 
@@ -96,6 +96,7 @@ prov_ri3 equiHashTable(@Node, DstAdd, PIDequi) :-
 /* Execution of original rh1*/
 rh1 packet(@Next, SrcAdd, DstAdd, Data, PIDHash) :-
     initPacketCount(@Node, SrcAdd, DstAdd, Data, PIDequi, ProgID, PIDcount),
+    flowEntry(@Node,DstAdd,Next),
     link(@Node, Next),
     PIDev := f_sha1("initPacket" + Node + SrcAdd + DstAdd + Data),
     PIDcount != 0,
@@ -108,13 +109,14 @@ rh1 packet(@Next, SrcAdd, DstAdd, Data, PIDHash) :-
 /* Execution of rh1 with provenance enabled*/
 prov_rh1_1 epacketTemp(@RLOC, Next, SrcAdd, DstAdd, Data, RID, R, List, Tag) :- 
 	   initPacketCount(@Node, SrcAdd, DstAdd, Data, PIDequi, ProgID, PIDcount),
+	   flowEntry(@Node,DstAdd,Next),
 	   link(@Node, Next),
 	   PIDcount == 0,
+	   R := "rh1", 
 	   PID := f_sha1(("link"+ Node)+ Next), 
 	   List := f_append(PID), 
 	   RLOC := Node, 
 	   RID := f_sha1((R+ RLOC)+ List),
-	   R := "rh1", 
 	   Equilist := f_append(PIDequi),
 	   PIDev := f_sha1(((("initPacket"+ Node)+ SrcAdd)+ DstAdd)+ Data),
            Evlist := f_append(PIDev),
@@ -154,7 +156,7 @@ prov_rh2_4 provLink(@RLOC, RID, CurCount, Preloc, PreRID, PreCount) :-
 	   PreCount := f_first(Tag),
 	   CurCount := PreCount + 1,
 	   TempTag1 := f_removeFirst(Tag),
-	   Preloc := f_first(TempTag),
+	   Preloc := f_first(TempTag1),
 	   TempTag2 := f_removeFirst(TempTag1),
 	   PreRID := f_first(TempTag2).
 
@@ -188,7 +190,7 @@ ro1 provHashTable(@Node, EquiHash, ProgID, Loc, RID, Count) :-
 	   PIDev := f_first(RemainTag4),
 	   RemainTag5 := f_removeFirst(RemainTag4),
 	   ProgID := f_first(RemainTag5),
-	   EquiHash := f_sha1(ProgID, PIDequi).
+	   EquiHash := f_sha1(""+ProgID+PIDequi).
 
 ro2 recvPacketProv(@Node, PID, EquiHash, PIDev) :-
 	   recvPacket(@Node, SrcAdd, DstAdd, Data, Tag),
@@ -204,7 +206,7 @@ ro2 recvPacketProv(@Node, PID, EquiHash, PIDev) :-
 	   PIDev := f_first(RemainTag4),
 	   RemainTag5 := f_removeFirst(RemainTag4),
 	   ProgID := f_first(RemainTag5),
-	   EquiHash := f_sha1(ProgID, PIDequi).
+	   EquiHash := f_sha1(""+ProgID+PIDequi).
 
 
 /* Execution of original rh2*/
@@ -221,5 +223,5 @@ rho3 recvPacketProv(@Node, PID, EquiHash, PIDev) :-
 	PIDev := f_first(PIDHash1),
 	PIDHash2 := f_removeFirst(PIDHash1),
 	ProgID := f_first(PIDHash2),
-	EquiHash := f_sha1(ProgID, PIDequi).
+	EquiHash := f_sha1(""+ProgID+PIDequi).
 

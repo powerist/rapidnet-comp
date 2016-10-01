@@ -1,18 +1,45 @@
 /*Materialized table*/
 materialize(initPacket,infinity,infinity,keys(2,3,4:str)). /*Input packets at hosts*/
-materialize(recvPacket,infinity,infinity,keys(2,3,4:str)). /*Received packets at hosts*/
+
+/*materialize(recvPacket,infinity,infinity,keys(2,3,4:str)).*/
 materialize(link,infinity,infinity,keys(2)). /*Links between routers and other devices*/
 materialize(flowEntry,infinity,infinity,keys(2)). /*Links between routers and other devices*/
 
 /* Provenance tables*/
 materialize(ruleExec, infinity, infinity, keys(2:cid,5,6:cid)).
-materialize(prov, infinity, infinity, keys(2:cid,3,4:cid)).
+
+materialize(prov, infinity, infinity, keys(2:cid,3:cid,4)).
+materialize(provRoot, infinity, infinity, keys(2:cid,3:cid,4)).
 
 /* Tables for provenance query*/
 materialize(rResultTmp,infinity,infinity,keys(1,2:cid)).
 materialize(rQList,infinity,infinity,keys(1,2:cid)).
 materialize(pResultTmp,infinity,infinity,keys(1,2:cid)).
 materialize(childWait,infinity,infinity,keys(1,2:cid,3:cid)).
+
+materialize(pQList,infinity,infinity,keys(1,2:cid)).
+
+/*Tables for automatic provenance querying*/
+materialize(recordSD,infinity,infinity,keys(2,3)).
+materialize(initProvQuery,infinity,infinity,keys(2:cid,3:cid,4)).
+
+
+
+/* Edb provenance rules*/
+r00 prov(@Node, VID, RID, Node) :-
+    initPacket(@Node, SrcAdd, DstAdd, Data),
+    VID := f_sha1("initPacket" + Node + SrcAdd + DstAdd + Data),
+    RID := VID.
+
+r01 prov(@Node, VID, RID, Node) :-
+    link(@Node, Next),
+    VID := f_sha1("link" + Node+ Next),
+    RID := VID.
+
+r03 prov(@Node, VID, RID, Node) :-
+    flowEntry(@Node, DstEntry, Next),
+    VID := f_sha1("flowEntry" + Node+ DstEntry + Next),
+    RID := VID.
 
 
 /* Forward a packet*/
@@ -47,13 +74,14 @@ prov_rs1_3 packet(@Next, SrcAdd, DstAdd, Data, RLOC, RID) :-
 /* Packet initialization*/
 prov_rh1_1 epacketTemp(@RLOC, Next, SrcAdd, DstAdd, Data, RID, R, List, PreInfolist) :-
     initPacket(@Node, SrcAdd, DstAdd, Data),
+    flowEntry(@Node,DstAdd,Next),
     link(@Node, Next),
     PID2 := f_sha1(((("initPacket"+ Node)+ SrcAdd)+ DstAdd)+ Data),
     List := f_append(PID2),
-    PID3 := f_sha1(("linkhr"+ Node)+ Next),
+    PID3 := f_sha1(("link"+ Node)+ Next),
     List3 := f_append(PID3),
     List := f_concat(List, List3),
-    PreLoc := f_sha1("NULL"),
+    PreLoc := Node,
     PreLoclist := f_append(PreLoc),
     PreRID := f_sha1("NULL"),
     PreRIDlist := f_append(PreRID),
@@ -84,9 +112,11 @@ prov_rh2_2 ruleExec(@RLOC, RID, R, List, PreLoc, PreRID) :-
 prov_rh2_3 recvPacket(@Node, SrcAdd, DstAdd, Data, RID, RLOC) :-
     erecvPacketTemp(@RLOC, Node, SrcAdd, DstAdd, Data, RID, R, List, PreInfolist).
 
-prov_rh2_5 prov(@Node, VID, RLOC, RID) :-
+
+prov_rh2_5 provRoot(@Node, VID, RID, RLOC) :-
     recvPacket(@Node, SrcAdd, DstAdd, Data, RID, RLOC),
     VID := f_sha1(((("recvPacket"+ Node)+ SrcAdd)+ DstAdd)+ Data).
+
 
 /* Query program */
 
@@ -95,37 +125,54 @@ prov_rh2_5 prov(@Node, VID, RLOC, RID) :-
 edb1 baseReturn(@Ret,QID,VID,Prov) :- baseQuery(@X,QID,VID,Ret), Prov:=f_pEDB(VID,X).
 
 /* root vertex */
-rtdb1 ruleQuery(@RLoc,NQID,RID,X) :- provQuery(@X,QID,VID,Ret),
-       prov(@X,VID,RLoc,RID), RID!=VID,
- NQID:=f_sha1(""+QID+RID).
-rtdb2 pResultTmp(@X,QID,Ret,VID,Buf) :-
+
+idb1 pQList(@X,QID,a_LIST<RID>) :- provQuery(@X,QID,VID,Ret),
+       provRoot(@X,VID,RID,RLoc), RID!=VID.
+idb2 pResultTmp(@X,QID,Ret,VID,Buf) :-
        provQuery(@X,QID,VID,Ret), Buf:=f_empty().
 
-rtdb3 pResultTmp(@X,QID,Ret,VID,Buf) :- rReturn(@X,NQID,RID,Prov),
+idb3 pIterate(@X,QID,N) :- provQuery(@X,QID,VID,Ret), N:=1.
+idb4 pIterate(@X,QID,N) :- pIterate(@X,QID,N1),
+       pQList(@X,QID,List), N1<f_size(List), N:=N1+1.
+
+idb5 eRuleQuery(@X,NQID,RID) :- pIterate(@X,QID,N),
+       pQList(@X,QID,List), N<=f_size(List),
+       RID:=f_item(List,N), NQID:=f_sha1(""+QID+RID).
+idb6 ruleQuery(@RLoc,QID,RID,X) :- eRuleQuery(@X,QID,RID),
+       provRoot(@X,VID,RID,RLoc).
+
+idb7 pResultTmp(@X,QID,Ret,VID,Buf) :- rReturn(@X,NQID,RID,Prov),
        pResultTmp(@X,QID,Ret,VID,Buf1), NQID==f_sha1(""+QID+RID),
        Buf2:=f_append(Prov), Buf:=f_concat(Buf1,Buf2).
 
-rtdb4 pReturn(@Ret,QID,VID,Prov) :- pResultTmp(@X,QID,Ret,VID,Buf), Prov:=f_pIDB(Buf,X).
+idb8 ePReturn(@X,QID) :- pResultTmp(@X,QID,Ret,VID,Buf),
+       pQList(@X,QID,List),
+       f_size(Buf)==f_size(List), f_size(Buf)!=0.
+
+idb9 pReturn(@Ret,QID,VID,Prov) :- ePReturn(@X,QID),
+       pResultTmp(@X,QID,Ret,VID,Buf), Prov:=f_pIDB(Buf,X).
+
 
 /* Rule Vertex */
 rv1 rQList(@X,QID,List) :- ruleQuery(@X,QID,RID,Ret),
       ruleExec(@X,RID,R,List, PreLoc, PreRID).
 
-rv2 ruleQuery(@PreLoc,NQID,PreRID,Ret) :- ruleQuery(@X,QID,RID,Ret),
+
+rv2 ruleQuery(@PreLoc,NQID,PreRID,X) :- ruleQuery(@X,QID,RID,Ret),
  ruleExec(@X,RID,R,List, PreLoc, PreRID),
  PreRID != f_sha1("NULL"),
- NQID:=f_sha1(""+QID+VID).
+ NQID:=f_sha1(""+QID+PreRID).
 
 rv3 childWait(@X,QID,RID,Ret,Itm) :- ruleQuery(@X,QID,RID,Ret),
  ruleExec(@X,RID,R,List, PreLoc, PreRID),
  PreRID == f_sha1("NULL"),
- NQID:=f_sha1(""+QID+VID),
+ NQID:=f_sha1(""+QID+PreRID),
  Itm := 0.
 
 rv4 childWait(@X,QID,RID,Ret,Itm) :- ruleQuery(@X,QID,RID,Ret),
  ruleExec(@X,RID,R,List, PreLoc, PreRID),
  PreRID != f_sha1("NULL"),
- NQID:=f_sha1(""+QID+VID),
+ NQID:=f_sha1(""+QID+PreRID),
  Itm := 1.
 
 rv5 rResultTmp(@X,QID,Ret,RID,Buf) :-
@@ -135,7 +182,7 @@ rv6 rIterate(@X,QID,N) :- ruleQuery(@X,QID,RID,Ret), N:=1.
 rv7 rIterate(@X,QID,N) :- rIterate(@X,QID,N1),
       rQList(@X,QID,List), N1<f_size(List), N:=N1+1.
 
-rv8 baseQuery(@X,NQID,VID) :- rIterate(@X,QID,N),
+rv8 baseQuery(@X,NQID,VID,X) :- rIterate(@X,QID,N),
       rQList(@X,QID,List),
       VID:=f_item(List,N), NQID:=f_sha1(""+QID+VID).
 
@@ -143,9 +190,9 @@ rv9 rResultTmp(@X,QID,Ret,RID,Buf) :- baseReturn(@X,NQID,VID,Prov),
       rResultTmp(@X,QID,Ret,RID,Buf1), NQID==f_sha1(""+QID+VID),
       Buf2:=f_append(Prov), Buf:=f_concat(Buf1,Buf2).
 
-rv10 rResultTmp(@X,QID,Ret,RID,Buf):- rReturn(@X,QID,RID,Prov),
+rv10 rResultTmp(@X,QID,Ret,RID,Buf):- rReturn(@X,NQID,PreRID,Prov),
  rResultTmp(@X,QID,Ret,RID,Buf1),
- NQID==f_sha1(""+QID+RID),
+ NQID==f_sha1(""+QID+PreRID),
  Buf2:=f_append(Prov),
  Buf:=f_concat(Buf2, Buf1).
 
@@ -160,3 +207,27 @@ rv12 eRReturn(@X,QID) :- rResultTmp(@X,QID,Ret,RID,Buf),
 rv13 rReturn(@Ret,QID,RID,Prov) :- eRReturn(@X,QID),
       rResultTmp(@X,QID,Ret,RID,Buf),
       ruleExec(@X,RID,R,List,PreLoc,PreRID), Prov:=f_pRULE(Buf,X,R).
+
+
+q1 recvCount(@Node,Src,Dst,Data,a_COUNT<*>):-
+   recvPacket(@Node,Src,Dst,Data,RID,RLOC),
+   recordSD(@Node,Src,Dst).
+
+
+q2 recordSD(@Node,Src,Dst):-
+   recvCount(@Node,Src,Dst,Data,Rcount),
+   Rcount==0.
+
+q3 initProvQuery(@Node,QID,UID,Dst):-
+   recvCount(@Node,Src,Dst,Data,Rcount),
+   Rcount==0,
+   Time:=f_now(),
+   UID:=f_sha1("recvPacket"+Node+Src+Dst+Data),
+   QID:=f_sha1(""+UID+Time).
+
+q4 provQuery(@Node,QID,UID,Dst):-
+   initProvQuery(@Node,QID,UID,Dst).
+
+q5 recordProv(@Node,QID,UID,Prov):-
+   initProvQuery(@Node,QID,UID,Dst),
+   pReturn(@Node,QID,UID,Prov).

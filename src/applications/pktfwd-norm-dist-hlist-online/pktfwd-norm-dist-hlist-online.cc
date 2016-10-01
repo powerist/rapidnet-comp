@@ -108,7 +108,7 @@ PktfwdNormDistHlistOnline::InitDatabase ()
     attrdef ("programID_attr2", IPV4)));
 
   AddRelationWithKeys (PROVHASHTABLE, attrdeflist (
-    attrdef ("provHashTable_attr3", LIST)));
+    attrdef ("provHashTable_attr3", STR)));
 
   AddRelationWithKeys (PROVLINK, attrdeflist (
     attrdef ("provLink_attr2", ID),
@@ -395,7 +395,7 @@ PktfwdNormDistHlistOnline::Prov_rs1_4_eca (Ptr<Tuple> epacketTemp)
 
   result->Assign (Assignor::New ("Preloc",
     FFirst::New (
-      VarExpr::New ("TempTag"))));
+      VarExpr::New ("TempTag1"))));
 
   result->Assign (Assignor::New ("TempTag2",
     FRemoveFirst::New (
@@ -672,10 +672,15 @@ PktfwdNormDistHlistOnline::Rh1_eca (Ptr<Tuple> initPacketCount)
 
   Ptr<RelationBase> result;
 
-  result = GetRelation (LINK)->Join (
+  result = GetRelation (FLOWENTRY)->Join (
     initPacketCount,
-    strlist ("link_attr1"),
-    strlist ("initPacketCount_attr1"));
+    strlist ("flowEntry_attr2", "flowEntry_attr1"),
+    strlist ("initPacketCount_attr3", "initPacketCount_attr1"));
+
+  result = GetRelation (LINK)->Join (
+    result,
+    strlist ("link_attr2", "link_attr1"),
+    strlist ("flowEntry_attr3", "initPacketCount_attr1"));
 
   result->Assign (Assignor::New ("PIDev",
     FSha1::New (
@@ -718,12 +723,12 @@ PktfwdNormDistHlistOnline::Rh1_eca (Ptr<Tuple> initPacketCount)
 
   result = result->Project (
     PACKET,
-    strlist ("link_attr2",
+    strlist ("flowEntry_attr3",
       "initPacketCount_attr2",
       "initPacketCount_attr3",
       "initPacketCount_attr4",
       "PIDHash",
-      "link_attr2"),
+      "flowEntry_attr3"),
     strlist ("packet_attr1",
       "packet_attr2",
       "packet_attr3",
@@ -741,10 +746,18 @@ PktfwdNormDistHlistOnline::Prov_rh1_1_eca (Ptr<Tuple> initPacketCount)
 
   Ptr<RelationBase> result;
 
-  result = GetRelation (LINK)->Join (
+  result = GetRelation (FLOWENTRY)->Join (
     initPacketCount,
-    strlist ("link_attr1"),
-    strlist ("initPacketCount_attr1"));
+    strlist ("flowEntry_attr2", "flowEntry_attr1"),
+    strlist ("initPacketCount_attr3", "initPacketCount_attr1"));
+
+  result = GetRelation (LINK)->Join (
+    result,
+    strlist ("link_attr2", "link_attr1"),
+    strlist ("flowEntry_attr3", "initPacketCount_attr1"));
+
+  result->Assign (Assignor::New ("R",
+    ValueExpr::New (StrValue::New ("rh1"))));
 
   result->Assign (Assignor::New ("PID",
     FSha1::New (
@@ -752,7 +765,7 @@ PktfwdNormDistHlistOnline::Prov_rh1_1_eca (Ptr<Tuple> initPacketCount)
         Operation::New (RN_PLUS,
           ValueExpr::New (StrValue::New ("link")),
           VarExpr::New ("initPacketCount_attr1")),
-        VarExpr::New ("link_attr2")))));
+        VarExpr::New ("flowEntry_attr3")))));
 
   result->Assign (Assignor::New ("List",
     FAppend::New (
@@ -768,9 +781,6 @@ PktfwdNormDistHlistOnline::Prov_rh1_1_eca (Ptr<Tuple> initPacketCount)
           VarExpr::New ("R"),
           VarExpr::New ("RLOC")),
         VarExpr::New ("List")))));
-
-  result->Assign (Assignor::New ("R",
-    ValueExpr::New (StrValue::New ("rh1"))));
 
   result->Assign (Assignor::New ("Equilist",
     FAppend::New (
@@ -851,7 +861,7 @@ PktfwdNormDistHlistOnline::Prov_rh1_1_eca (Ptr<Tuple> initPacketCount)
   result = result->Project (
     EPACKETTEMP,
     strlist ("RLOC",
-      "link_attr2",
+      "flowEntry_attr3",
       "initPacketCount_attr2",
       "initPacketCount_attr3",
       "initPacketCount_attr4",
@@ -994,7 +1004,7 @@ PktfwdNormDistHlistOnline::Prov_rh2_4_eca (Ptr<Tuple> erecvPacketTemp)
 
   result->Assign (Assignor::New ("Preloc",
     FFirst::New (
-      VarExpr::New ("TempTag"))));
+      VarExpr::New ("TempTag1"))));
 
   result->Assign (Assignor::New ("TempTag2",
     FRemoveFirst::New (
@@ -1171,8 +1181,11 @@ PktfwdNormDistHlistOnline::Ro1Eca0Ins (Ptr<Tuple> recvPacket)
 
   result->Assign (Assignor::New ("EquiHash",
     FSha1::New (
-      VarExpr::New ("ProgID"),
-      VarExpr::New ("PIDequi"))));
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          ValueExpr::New (StrValue::New ("")),
+          VarExpr::New ("ProgID")),
+        VarExpr::New ("PIDequi")))));
 
   result = result->Project (
     PROVHASHTABLE,
@@ -1245,8 +1258,11 @@ PktfwdNormDistHlistOnline::Ro1Eca0Del (Ptr<Tuple> recvPacket)
 
   result->Assign (Assignor::New ("EquiHash",
     FSha1::New (
-      VarExpr::New ("ProgID"),
-      VarExpr::New ("PIDequi"))));
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          ValueExpr::New (StrValue::New ("")),
+          VarExpr::New ("ProgID")),
+        VarExpr::New ("PIDequi")))));
 
   result = result->Project (
     PROVHASHTABLE,
@@ -1331,8 +1347,11 @@ PktfwdNormDistHlistOnline::Ro2Eca0Ins (Ptr<Tuple> recvPacket)
 
   result->Assign (Assignor::New ("EquiHash",
     FSha1::New (
-      VarExpr::New ("ProgID"),
-      VarExpr::New ("PIDequi"))));
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          ValueExpr::New (StrValue::New ("")),
+          VarExpr::New ("ProgID")),
+        VarExpr::New ("PIDequi")))));
 
   result = result->Project (
     RECVPACKETPROV,
@@ -1413,8 +1432,11 @@ PktfwdNormDistHlistOnline::Ro2Eca0Del (Ptr<Tuple> recvPacket)
 
   result->Assign (Assignor::New ("EquiHash",
     FSha1::New (
-      VarExpr::New ("ProgID"),
-      VarExpr::New ("PIDequi"))));
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          ValueExpr::New (StrValue::New ("")),
+          VarExpr::New ("ProgID")),
+        VarExpr::New ("PIDequi")))));
 
   result = result->Project (
     RECVPACKETPROV,
@@ -1499,8 +1521,11 @@ PktfwdNormDistHlistOnline::Rho3_eca (Ptr<Tuple> recvPacketNP)
 
   result->Assign (Assignor::New ("EquiHash",
     FSha1::New (
-      VarExpr::New ("ProgID"),
-      VarExpr::New ("PIDequi"))));
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          ValueExpr::New (StrValue::New ("")),
+          VarExpr::New ("ProgID")),
+        VarExpr::New ("PIDequi")))));
 
   result = result->Select (Selector::New (
     Operation::New (RN_EQ,

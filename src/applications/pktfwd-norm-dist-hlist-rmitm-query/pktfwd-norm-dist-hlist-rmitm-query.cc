@@ -19,22 +19,30 @@ using namespace ns3::rapidnet::pktfwdnormdisthlistrmitmquery;
 const string PktfwdNormDistHlistRmitmQuery::BASEQUERY = "baseQuery";
 const string PktfwdNormDistHlistRmitmQuery::BASERETURN = "baseReturn";
 const string PktfwdNormDistHlistRmitmQuery::CHILDWAIT = "childWait";
+const string PktfwdNormDistHlistRmitmQuery::EPRETURN = "ePReturn";
 const string PktfwdNormDistHlistRmitmQuery::ERRETURN = "eRReturn";
+const string PktfwdNormDistHlistRmitmQuery::ERULEQUERY = "eRuleQuery";
 const string PktfwdNormDistHlistRmitmQuery::EPACKETTEMP = "epacketTemp";
 const string PktfwdNormDistHlistRmitmQuery::ERECVPACKETTEMP = "erecvPacketTemp";
 const string PktfwdNormDistHlistRmitmQuery::FLOWENTRY = "flowEntry";
 const string PktfwdNormDistHlistRmitmQuery::INITPACKET = "initPacket";
+const string PktfwdNormDistHlistRmitmQuery::INITPROVQUERY = "initProvQuery";
 const string PktfwdNormDistHlistRmitmQuery::LINK = "link";
+const string PktfwdNormDistHlistRmitmQuery::PITERATE = "pIterate";
+const string PktfwdNormDistHlistRmitmQuery::PQLIST = "pQList";
 const string PktfwdNormDistHlistRmitmQuery::PRESULTTMP = "pResultTmp";
 const string PktfwdNormDistHlistRmitmQuery::PRETURN = "pReturn";
 const string PktfwdNormDistHlistRmitmQuery::PACKET = "packet";
 const string PktfwdNormDistHlistRmitmQuery::PROV = "prov";
 const string PktfwdNormDistHlistRmitmQuery::PROVQUERY = "provQuery";
-const string PktfwdNormDistHlistRmitmQuery::PROV_RH2_3RECVPACKETSEND = "prov_rh2_3recvPacketsend";
+const string PktfwdNormDistHlistRmitmQuery::PROVROOT = "provRoot";
 const string PktfwdNormDistHlistRmitmQuery::RITERATE = "rIterate";
 const string PktfwdNormDistHlistRmitmQuery::RQLIST = "rQList";
 const string PktfwdNormDistHlistRmitmQuery::RRESULTTMP = "rResultTmp";
 const string PktfwdNormDistHlistRmitmQuery::RRETURN = "rReturn";
+const string PktfwdNormDistHlistRmitmQuery::RECORDPROV = "recordProv";
+const string PktfwdNormDistHlistRmitmQuery::RECORDSD = "recordSD";
+const string PktfwdNormDistHlistRmitmQuery::RECVCOUNT = "recvCount";
 const string PktfwdNormDistHlistRmitmQuery::RECVPACKET = "recvPacket";
 const string PktfwdNormDistHlistRmitmQuery::RULEEXEC = "ruleExec";
 const string PktfwdNormDistHlistRmitmQuery::RULEQUERY = "ruleQuery";
@@ -106,8 +114,17 @@ PktfwdNormDistHlistRmitmQuery::InitDatabase ()
     attrdef ("initPacket_attr3", IPV4),
     attrdef ("initPacket_attr4", STR)));
 
+  AddRelationWithKeys (INITPROVQUERY, attrdeflist (
+    attrdef ("initProvQuery_attr2", ID),
+    attrdef ("initProvQuery_attr3", ID),
+    attrdef ("initProvQuery_attr4", IPV4)));
+
   AddRelationWithKeys (LINK, attrdeflist (
     attrdef ("link_attr2", IPV4)));
+
+  AddRelationWithKeys (PQLIST, attrdeflist (
+    attrdef ("pQList_attr1", IPV4),
+    attrdef ("pQList_attr2", ID)));
 
   AddRelationWithKeys (PRESULTTMP, attrdeflist (
     attrdef ("pResultTmp_attr1", IPV4),
@@ -115,8 +132,13 @@ PktfwdNormDistHlistRmitmQuery::InitDatabase ()
 
   AddRelationWithKeys (PROV, attrdeflist (
     attrdef ("prov_attr2", ID),
-    attrdef ("prov_attr3", IPV4),
-    attrdef ("prov_attr4", ID)));
+    attrdef ("prov_attr3", ID),
+    attrdef ("prov_attr4", IPV4)));
+
+  AddRelationWithKeys (PROVROOT, attrdeflist (
+    attrdef ("provRoot_attr2", ID),
+    attrdef ("provRoot_attr3", ID),
+    attrdef ("provRoot_attr4", IPV4)));
 
   AddRelationWithKeys (RQLIST, attrdeflist (
     attrdef ("rQList_attr1", IPV4),
@@ -126,10 +148,9 @@ PktfwdNormDistHlistRmitmQuery::InitDatabase ()
     attrdef ("rResultTmp_attr1", IPV4),
     attrdef ("rResultTmp_attr2", ID)));
 
-  AddRelationWithKeys (RECVPACKET, attrdeflist (
-    attrdef ("recvPacket_attr2", IPV4),
-    attrdef ("recvPacket_attr3", IPV4),
-    attrdef ("recvPacket_attr4", STR)));
+  AddRelationWithKeys (RECORDSD, attrdeflist (
+    attrdef ("recordSD_attr2", IPV4),
+    attrdef ("recordSD_attr3", IPV4)));
 
   AddRelationWithKeys (RULEEXEC, attrdeflist (
     attrdef ("ruleExec_attr2", ID),
@@ -143,6 +164,30 @@ PktfwdNormDistHlistRmitmQuery::DemuxRecv (Ptr<Tuple> tuple)
 {
   RapidNetApplicationBase::DemuxRecv (tuple);
 
+  if (IsInsertEvent (tuple, INITPACKET))
+    {
+      R00Eca1Ins (tuple);
+    }
+  if (IsDeleteEvent (tuple, INITPACKET))
+    {
+      R00Eca1Del (tuple);
+    }
+  if (IsInsertEvent (tuple, LINK))
+    {
+      R01Eca1Ins (tuple);
+    }
+  if (IsDeleteEvent (tuple, LINK))
+    {
+      R01Eca1Del (tuple);
+    }
+  if (IsInsertEvent (tuple, FLOWENTRY))
+    {
+      R03Eca1Ins (tuple);
+    }
+  if (IsDeleteEvent (tuple, FLOWENTRY))
+    {
+      R03Eca1Del (tuple);
+    }
   if (IsRecvEvent (tuple, PACKET))
     {
       Prov_rs1_1_eca (tuple);
@@ -159,9 +204,13 @@ PktfwdNormDistHlistRmitmQuery::DemuxRecv (Ptr<Tuple> tuple)
     {
       Prov_rh1_1Eca0Ins (tuple);
     }
-  if (IsInsertEvent (tuple, LINK))
+  if (IsInsertEvent (tuple, FLOWENTRY))
     {
       Prov_rh1_1Eca1Ins (tuple);
+    }
+  if (IsInsertEvent (tuple, LINK))
+    {
+      Prov_rh1_1Eca2Ins (tuple);
     }
   if (IsRecvEvent (tuple, PACKET))
     {
@@ -171,21 +220,13 @@ PktfwdNormDistHlistRmitmQuery::DemuxRecv (Ptr<Tuple> tuple)
     {
       Prov_rh2_2_eca (tuple);
     }
-  if (IsRecvEvent (tuple, PROV_RH2_3RECVPACKETSEND))
-    {
-      Prov_rh2_3ECAMat (tuple);
-    }
   if (IsRecvEvent (tuple, ERECVPACKETTEMP))
     {
       Prov_rh2_3_eca (tuple);
     }
-  if (IsInsertEvent (tuple, RECVPACKET))
+  if (IsRecvEvent (tuple, RECVPACKET))
     {
-      Prov_rh2_5Eca0Ins (tuple);
-    }
-  if (IsDeleteEvent (tuple, RECVPACKET))
-    {
-      Prov_rh2_5Eca0Del (tuple);
+      Prov_rh2_5_eca (tuple);
     }
   if (IsRecvEvent (tuple, BASEQUERY))
     {
@@ -193,19 +234,43 @@ PktfwdNormDistHlistRmitmQuery::DemuxRecv (Ptr<Tuple> tuple)
     }
   if (IsRecvEvent (tuple, PROVQUERY))
     {
-      Rtdb1_eca (tuple);
+      Idb1_eca (tuple);
     }
   if (IsRecvEvent (tuple, PROVQUERY))
     {
-      Rtdb2_eca (tuple);
+      Idb2_eca (tuple);
+    }
+  if (IsRecvEvent (tuple, PROVQUERY))
+    {
+      Idb3_eca (tuple);
+    }
+  if (IsRecvEvent (tuple, PITERATE))
+    {
+      Idb4_eca (tuple);
+    }
+  if (IsRecvEvent (tuple, PITERATE))
+    {
+      Idb5_eca (tuple);
+    }
+  if (IsRecvEvent (tuple, ERULEQUERY))
+    {
+      Idb6_eca (tuple);
     }
   if (IsRecvEvent (tuple, RRETURN))
     {
-      Rtdb3_eca (tuple);
+      Idb7_eca (tuple);
     }
   if (IsInsertEvent (tuple, PRESULTTMP))
     {
-      Rtdb4Eca0Ins (tuple);
+      Idb8Eca0Ins (tuple);
+    }
+  if (IsInsertEvent (tuple, PQLIST))
+    {
+      Idb8Eca1Ins (tuple);
+    }
+  if (IsRecvEvent (tuple, EPRETURN))
+    {
+      Idb9_eca (tuple);
     }
   if (IsRecvEvent (tuple, RULEQUERY))
     {
@@ -275,6 +340,248 @@ PktfwdNormDistHlistRmitmQuery::DemuxRecv (Ptr<Tuple> tuple)
     {
       Rv13_eca (tuple);
     }
+  if (IsRecvEvent (tuple, RECVPACKET))
+    {
+      Q1_eca (tuple);
+    }
+  if (IsRecvEvent (tuple, RECVCOUNT))
+    {
+      Q2_eca (tuple);
+    }
+  if (IsRecvEvent (tuple, RECVCOUNT))
+    {
+      Q3_eca (tuple);
+    }
+  if (IsInsertEvent (tuple, INITPROVQUERY))
+    {
+      Q4Eca0Ins (tuple);
+    }
+  if (IsRecvEvent (tuple, PRETURN))
+    {
+      Q5_eca (tuple);
+    }
+}
+
+void
+PktfwdNormDistHlistRmitmQuery::R00Eca1Ins (Ptr<Tuple> initPacket)
+{
+  RAPIDNET_LOG_INFO ("R00Eca1Ins triggered");
+
+  Ptr<Tuple> result = initPacket;
+
+  result->Assign (Assignor::New ("$1",
+    VarExpr::New ("initPacket_attr1")));
+
+  result->Assign (Assignor::New ("VID",
+    FSha1::New (
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          Operation::New (RN_PLUS,
+            Operation::New (RN_PLUS,
+              ValueExpr::New (StrValue::New ("initPacket")),
+              VarExpr::New ("initPacket_attr1")),
+            VarExpr::New ("initPacket_attr2")),
+          VarExpr::New ("initPacket_attr3")),
+        VarExpr::New ("initPacket_attr4")))));
+
+  result->Assign (Assignor::New ("RID",
+    VarExpr::New ("VID")));
+
+  result = result->Project (
+    PROV,
+    strlist ("initPacket_attr1",
+      "VID",
+      "RID",
+      "$1"),
+    strlist ("prov_attr1",
+      "prov_attr2",
+      "prov_attr3",
+      "prov_attr4"));
+
+  Insert (result);
+}
+
+void
+PktfwdNormDistHlistRmitmQuery::R00Eca1Del (Ptr<Tuple> initPacket)
+{
+  RAPIDNET_LOG_INFO ("R00Eca1Del triggered");
+
+  Ptr<Tuple> result = initPacket;
+
+  result->Assign (Assignor::New ("$1",
+    VarExpr::New ("initPacket_attr1")));
+
+  result->Assign (Assignor::New ("VID",
+    FSha1::New (
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          Operation::New (RN_PLUS,
+            Operation::New (RN_PLUS,
+              ValueExpr::New (StrValue::New ("initPacket")),
+              VarExpr::New ("initPacket_attr1")),
+            VarExpr::New ("initPacket_attr2")),
+          VarExpr::New ("initPacket_attr3")),
+        VarExpr::New ("initPacket_attr4")))));
+
+  result->Assign (Assignor::New ("RID",
+    VarExpr::New ("VID")));
+
+  result = result->Project (
+    PROV,
+    strlist ("initPacket_attr1",
+      "VID",
+      "RID",
+      "$1"),
+    strlist ("prov_attr1",
+      "prov_attr2",
+      "prov_attr3",
+      "prov_attr4"));
+
+  Delete (result);
+}
+
+void
+PktfwdNormDistHlistRmitmQuery::R01Eca1Ins (Ptr<Tuple> link)
+{
+  RAPIDNET_LOG_INFO ("R01Eca1Ins triggered");
+
+  Ptr<Tuple> result = link;
+
+  result->Assign (Assignor::New ("$1",
+    VarExpr::New ("link_attr1")));
+
+  result->Assign (Assignor::New ("VID",
+    FSha1::New (
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          ValueExpr::New (StrValue::New ("link")),
+          VarExpr::New ("link_attr1")),
+        VarExpr::New ("link_attr2")))));
+
+  result->Assign (Assignor::New ("RID",
+    VarExpr::New ("VID")));
+
+  result = result->Project (
+    PROV,
+    strlist ("link_attr1",
+      "VID",
+      "RID",
+      "$1"),
+    strlist ("prov_attr1",
+      "prov_attr2",
+      "prov_attr3",
+      "prov_attr4"));
+
+  Insert (result);
+}
+
+void
+PktfwdNormDistHlistRmitmQuery::R01Eca1Del (Ptr<Tuple> link)
+{
+  RAPIDNET_LOG_INFO ("R01Eca1Del triggered");
+
+  Ptr<Tuple> result = link;
+
+  result->Assign (Assignor::New ("$1",
+    VarExpr::New ("link_attr1")));
+
+  result->Assign (Assignor::New ("VID",
+    FSha1::New (
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          ValueExpr::New (StrValue::New ("link")),
+          VarExpr::New ("link_attr1")),
+        VarExpr::New ("link_attr2")))));
+
+  result->Assign (Assignor::New ("RID",
+    VarExpr::New ("VID")));
+
+  result = result->Project (
+    PROV,
+    strlist ("link_attr1",
+      "VID",
+      "RID",
+      "$1"),
+    strlist ("prov_attr1",
+      "prov_attr2",
+      "prov_attr3",
+      "prov_attr4"));
+
+  Delete (result);
+}
+
+void
+PktfwdNormDistHlistRmitmQuery::R03Eca1Ins (Ptr<Tuple> flowEntry)
+{
+  RAPIDNET_LOG_INFO ("R03Eca1Ins triggered");
+
+  Ptr<Tuple> result = flowEntry;
+
+  result->Assign (Assignor::New ("$1",
+    VarExpr::New ("flowEntry_attr1")));
+
+  result->Assign (Assignor::New ("VID",
+    FSha1::New (
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          Operation::New (RN_PLUS,
+            ValueExpr::New (StrValue::New ("flowEntry")),
+            VarExpr::New ("flowEntry_attr1")),
+          VarExpr::New ("flowEntry_attr2")),
+        VarExpr::New ("flowEntry_attr3")))));
+
+  result->Assign (Assignor::New ("RID",
+    VarExpr::New ("VID")));
+
+  result = result->Project (
+    PROV,
+    strlist ("flowEntry_attr1",
+      "VID",
+      "RID",
+      "$1"),
+    strlist ("prov_attr1",
+      "prov_attr2",
+      "prov_attr3",
+      "prov_attr4"));
+
+  Insert (result);
+}
+
+void
+PktfwdNormDistHlistRmitmQuery::R03Eca1Del (Ptr<Tuple> flowEntry)
+{
+  RAPIDNET_LOG_INFO ("R03Eca1Del triggered");
+
+  Ptr<Tuple> result = flowEntry;
+
+  result->Assign (Assignor::New ("$1",
+    VarExpr::New ("flowEntry_attr1")));
+
+  result->Assign (Assignor::New ("VID",
+    FSha1::New (
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          Operation::New (RN_PLUS,
+            ValueExpr::New (StrValue::New ("flowEntry")),
+            VarExpr::New ("flowEntry_attr1")),
+          VarExpr::New ("flowEntry_attr2")),
+        VarExpr::New ("flowEntry_attr3")))));
+
+  result->Assign (Assignor::New ("RID",
+    VarExpr::New ("VID")));
+
+  result = result->Project (
+    PROV,
+    strlist ("flowEntry_attr1",
+      "VID",
+      "RID",
+      "$1"),
+    strlist ("prov_attr1",
+      "prov_attr2",
+      "prov_attr3",
+      "prov_attr4"));
+
+  Delete (result);
 }
 
 void
@@ -470,10 +777,15 @@ PktfwdNormDistHlistRmitmQuery::Prov_rh1_1Eca0Ins (Ptr<Tuple> initPacket)
 
   Ptr<RelationBase> result;
 
-  result = GetRelation (LINK)->Join (
+  result = GetRelation (FLOWENTRY)->Join (
     initPacket,
-    strlist ("link_attr1"),
-    strlist ("initPacket_attr1"));
+    strlist ("flowEntry_attr2", "flowEntry_attr1"),
+    strlist ("initPacket_attr3", "initPacket_attr1"));
+
+  result = GetRelation (LINK)->Join (
+    result,
+    strlist ("link_attr2", "link_attr1"),
+    strlist ("flowEntry_attr3", "initPacket_attr1"));
 
   result->Assign (Assignor::New ("PID2",
     FSha1::New (
@@ -495,9 +807,9 @@ PktfwdNormDistHlistRmitmQuery::Prov_rh1_1Eca0Ins (Ptr<Tuple> initPacket)
     FSha1::New (
       Operation::New (RN_PLUS,
         Operation::New (RN_PLUS,
-          ValueExpr::New (StrValue::New ("linkhr")),
+          ValueExpr::New (StrValue::New ("link")),
           VarExpr::New ("initPacket_attr1")),
-        VarExpr::New ("link_attr2")))));
+        VarExpr::New ("flowEntry_attr3")))));
 
   result->Assign (Assignor::New ("List3",
     FAppend::New (
@@ -509,8 +821,7 @@ PktfwdNormDistHlistRmitmQuery::Prov_rh1_1Eca0Ins (Ptr<Tuple> initPacket)
       VarExpr::New ("List3"))));
 
   result->Assign (Assignor::New ("PreLoc",
-    FSha1::New (
-      ValueExpr::New (StrValue::New ("NULL")))));
+    VarExpr::New ("initPacket_attr1")));
 
   result->Assign (Assignor::New ("PreLoclist",
     FAppend::New (
@@ -546,7 +857,7 @@ PktfwdNormDistHlistRmitmQuery::Prov_rh1_1Eca0Ins (Ptr<Tuple> initPacket)
   result = result->Project (
     EPACKETTEMP,
     strlist ("RLOC",
-      "link_attr2",
+      "flowEntry_attr3",
       "initPacket_attr2",
       "initPacket_attr3",
       "initPacket_attr4",
@@ -570,9 +881,119 @@ PktfwdNormDistHlistRmitmQuery::Prov_rh1_1Eca0Ins (Ptr<Tuple> initPacket)
 }
 
 void
-PktfwdNormDistHlistRmitmQuery::Prov_rh1_1Eca1Ins (Ptr<Tuple> link)
+PktfwdNormDistHlistRmitmQuery::Prov_rh1_1Eca1Ins (Ptr<Tuple> flowEntry)
 {
   RAPIDNET_LOG_INFO ("Prov_rh1_1Eca1Ins triggered");
+
+  Ptr<RelationBase> result;
+
+  result = GetRelation (INITPACKET)->Join (
+    flowEntry,
+    strlist ("initPacket_attr3", "initPacket_attr1"),
+    strlist ("flowEntry_attr2", "flowEntry_attr1"));
+
+  result = GetRelation (LINK)->Join (
+    result,
+    strlist ("link_attr2", "link_attr1"),
+    strlist ("flowEntry_attr3", "flowEntry_attr1"));
+
+  result->Assign (Assignor::New ("PID2",
+    FSha1::New (
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          Operation::New (RN_PLUS,
+            Operation::New (RN_PLUS,
+              ValueExpr::New (StrValue::New ("initPacket")),
+              VarExpr::New ("flowEntry_attr1")),
+            VarExpr::New ("initPacket_attr2")),
+          VarExpr::New ("flowEntry_attr2")),
+        VarExpr::New ("initPacket_attr4")))));
+
+  result->Assign (Assignor::New ("List",
+    FAppend::New (
+      VarExpr::New ("PID2"))));
+
+  result->Assign (Assignor::New ("PID3",
+    FSha1::New (
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          ValueExpr::New (StrValue::New ("link")),
+          VarExpr::New ("flowEntry_attr1")),
+        VarExpr::New ("flowEntry_attr3")))));
+
+  result->Assign (Assignor::New ("List3",
+    FAppend::New (
+      VarExpr::New ("PID3"))));
+
+  result->Assign (Assignor::New ("List",
+    FConcat::New (
+      VarExpr::New ("List"),
+      VarExpr::New ("List3"))));
+
+  result->Assign (Assignor::New ("PreLoc",
+    VarExpr::New ("flowEntry_attr1")));
+
+  result->Assign (Assignor::New ("PreLoclist",
+    FAppend::New (
+      VarExpr::New ("PreLoc"))));
+
+  result->Assign (Assignor::New ("PreRID",
+    FSha1::New (
+      ValueExpr::New (StrValue::New ("NULL")))));
+
+  result->Assign (Assignor::New ("PreRIDlist",
+    FAppend::New (
+      VarExpr::New ("PreRID"))));
+
+  result->Assign (Assignor::New ("RLOC",
+    VarExpr::New ("flowEntry_attr1")));
+
+  result->Assign (Assignor::New ("R",
+    ValueExpr::New (StrValue::New ("rh1"))));
+
+  result->Assign (Assignor::New ("RID",
+    FSha1::New (
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          VarExpr::New ("R"),
+          VarExpr::New ("RLOC")),
+        VarExpr::New ("List")))));
+
+  result->Assign (Assignor::New ("PreInfolist",
+    FConcat::New (
+      VarExpr::New ("PreLoclist"),
+      VarExpr::New ("PreRIDlist"))));
+
+  result = result->Project (
+    EPACKETTEMP,
+    strlist ("RLOC",
+      "flowEntry_attr3",
+      "initPacket_attr2",
+      "flowEntry_attr2",
+      "initPacket_attr4",
+      "RID",
+      "R",
+      "List",
+      "PreInfolist",
+      "RLOC"),
+    strlist ("epacketTemp_attr1",
+      "epacketTemp_attr2",
+      "epacketTemp_attr3",
+      "epacketTemp_attr4",
+      "epacketTemp_attr5",
+      "epacketTemp_attr6",
+      "epacketTemp_attr7",
+      "epacketTemp_attr8",
+      "epacketTemp_attr9",
+      RN_DEST));
+
+  Send (result);
+}
+
+void
+PktfwdNormDistHlistRmitmQuery::Prov_rh1_1Eca2Ins (Ptr<Tuple> link)
+{
+  RAPIDNET_LOG_INFO ("Prov_rh1_1Eca2Ins triggered");
 
   Ptr<RelationBase> result;
 
@@ -580,6 +1001,11 @@ PktfwdNormDistHlistRmitmQuery::Prov_rh1_1Eca1Ins (Ptr<Tuple> link)
     link,
     strlist ("initPacket_attr1"),
     strlist ("link_attr1"));
+
+  result = GetRelation (FLOWENTRY)->Join (
+    result,
+    strlist ("flowEntry_attr2", "flowEntry_attr3", "flowEntry_attr1"),
+    strlist ("initPacket_attr3", "link_attr2", "link_attr1"));
 
   result->Assign (Assignor::New ("PID2",
     FSha1::New (
@@ -601,7 +1027,7 @@ PktfwdNormDistHlistRmitmQuery::Prov_rh1_1Eca1Ins (Ptr<Tuple> link)
     FSha1::New (
       Operation::New (RN_PLUS,
         Operation::New (RN_PLUS,
-          ValueExpr::New (StrValue::New ("linkhr")),
+          ValueExpr::New (StrValue::New ("link")),
           VarExpr::New ("link_attr1")),
         VarExpr::New ("link_attr2")))));
 
@@ -615,8 +1041,7 @@ PktfwdNormDistHlistRmitmQuery::Prov_rh1_1Eca1Ins (Ptr<Tuple> link)
       VarExpr::New ("List3"))));
 
   result->Assign (Assignor::New ("PreLoc",
-    FSha1::New (
-      ValueExpr::New (StrValue::New ("NULL")))));
+    VarExpr::New ("link_attr1")));
 
   result->Assign (Assignor::New ("PreLoclist",
     FAppend::New (
@@ -794,31 +1219,6 @@ PktfwdNormDistHlistRmitmQuery::Prov_rh2_2_eca (Ptr<Tuple> erecvPacketTemp)
 }
 
 void
-PktfwdNormDistHlistRmitmQuery::Prov_rh2_3ECAMat (Ptr<Tuple> prov_rh2_3recvPacketsend)
-{
-  RAPIDNET_LOG_INFO ("Prov_rh2_3ECAMat triggered");
-
-  Ptr<Tuple> result = prov_rh2_3recvPacketsend;
-
-  result = result->Project (
-    RECVPACKET,
-    strlist ("prov_rh2_3recvPacketsend_attr1",
-      "prov_rh2_3recvPacketsend_attr2",
-      "prov_rh2_3recvPacketsend_attr3",
-      "prov_rh2_3recvPacketsend_attr4",
-      "prov_rh2_3recvPacketsend_attr5",
-      "prov_rh2_3recvPacketsend_attr6"),
-    strlist ("recvPacket_attr1",
-      "recvPacket_attr2",
-      "recvPacket_attr3",
-      "recvPacket_attr4",
-      "recvPacket_attr5",
-      "recvPacket_attr6"));
-
-  Insert (result);
-}
-
-void
 PktfwdNormDistHlistRmitmQuery::Prov_rh2_3_eca (Ptr<Tuple> erecvPacketTemp)
 {
   RAPIDNET_LOG_INFO ("Prov_rh2_3_eca triggered");
@@ -826,7 +1226,7 @@ PktfwdNormDistHlistRmitmQuery::Prov_rh2_3_eca (Ptr<Tuple> erecvPacketTemp)
   Ptr<Tuple> result = erecvPacketTemp;
 
   result = result->Project (
-    PROV_RH2_3RECVPACKETSEND,
+    RECVPACKET,
     strlist ("erecvPacketTemp_attr2",
       "erecvPacketTemp_attr3",
       "erecvPacketTemp_attr4",
@@ -834,21 +1234,21 @@ PktfwdNormDistHlistRmitmQuery::Prov_rh2_3_eca (Ptr<Tuple> erecvPacketTemp)
       "erecvPacketTemp_attr6",
       "erecvPacketTemp_attr1",
       "erecvPacketTemp_attr2"),
-    strlist ("prov_rh2_3recvPacketsend_attr1",
-      "prov_rh2_3recvPacketsend_attr2",
-      "prov_rh2_3recvPacketsend_attr3",
-      "prov_rh2_3recvPacketsend_attr4",
-      "prov_rh2_3recvPacketsend_attr5",
-      "prov_rh2_3recvPacketsend_attr6",
+    strlist ("recvPacket_attr1",
+      "recvPacket_attr2",
+      "recvPacket_attr3",
+      "recvPacket_attr4",
+      "recvPacket_attr5",
+      "recvPacket_attr6",
       RN_DEST));
 
   Send (result);
 }
 
 void
-PktfwdNormDistHlistRmitmQuery::Prov_rh2_5Eca0Ins (Ptr<Tuple> recvPacket)
+PktfwdNormDistHlistRmitmQuery::Prov_rh2_5_eca (Ptr<Tuple> recvPacket)
 {
-  RAPIDNET_LOG_INFO ("Prov_rh2_5Eca0Ins triggered");
+  RAPIDNET_LOG_INFO ("Prov_rh2_5_eca triggered");
 
   Ptr<Tuple> result = recvPacket;
 
@@ -865,50 +1265,17 @@ PktfwdNormDistHlistRmitmQuery::Prov_rh2_5Eca0Ins (Ptr<Tuple> recvPacket)
         VarExpr::New ("recvPacket_attr4")))));
 
   result = result->Project (
-    PROV,
+    PROVROOT,
     strlist ("recvPacket_attr1",
       "VID",
-      "recvPacket_attr6",
-      "recvPacket_attr5"),
-    strlist ("prov_attr1",
-      "prov_attr2",
-      "prov_attr3",
-      "prov_attr4"));
+      "recvPacket_attr5",
+      "recvPacket_attr6"),
+    strlist ("provRoot_attr1",
+      "provRoot_attr2",
+      "provRoot_attr3",
+      "provRoot_attr4"));
 
   Insert (result);
-}
-
-void
-PktfwdNormDistHlistRmitmQuery::Prov_rh2_5Eca0Del (Ptr<Tuple> recvPacket)
-{
-  RAPIDNET_LOG_INFO ("Prov_rh2_5Eca0Del triggered");
-
-  Ptr<Tuple> result = recvPacket;
-
-  result->Assign (Assignor::New ("VID",
-    FSha1::New (
-      Operation::New (RN_PLUS,
-        Operation::New (RN_PLUS,
-          Operation::New (RN_PLUS,
-            Operation::New (RN_PLUS,
-              ValueExpr::New (StrValue::New ("recvPacket")),
-              VarExpr::New ("recvPacket_attr1")),
-            VarExpr::New ("recvPacket_attr2")),
-          VarExpr::New ("recvPacket_attr3")),
-        VarExpr::New ("recvPacket_attr4")))));
-
-  result = result->Project (
-    PROV,
-    strlist ("recvPacket_attr1",
-      "VID",
-      "recvPacket_attr6",
-      "recvPacket_attr5"),
-    strlist ("prov_attr1",
-      "prov_attr2",
-      "prov_attr3",
-      "prov_attr4"));
-
-  Delete (result);
 }
 
 void
@@ -940,50 +1307,40 @@ PktfwdNormDistHlistRmitmQuery::Edb1_eca (Ptr<Tuple> baseQuery)
 }
 
 void
-PktfwdNormDistHlistRmitmQuery::Rtdb1_eca (Ptr<Tuple> provQuery)
+PktfwdNormDistHlistRmitmQuery::Idb1_eca (Ptr<Tuple> provQuery)
 {
-  RAPIDNET_LOG_INFO ("Rtdb1_eca triggered");
+  RAPIDNET_LOG_INFO ("Idb1_eca triggered");
 
   Ptr<RelationBase> result;
 
-  result = GetRelation (PROV)->Join (
+  result = GetRelation (PROVROOT)->Join (
     provQuery,
-    strlist ("prov_attr2", "prov_attr1"),
+    strlist ("provRoot_attr2", "provRoot_attr1"),
     strlist ("provQuery_attr3", "provQuery_attr1"));
-
-  result->Assign (Assignor::New ("NQID",
-    FSha1::New (
-      Operation::New (RN_PLUS,
-        Operation::New (RN_PLUS,
-          ValueExpr::New (StrValue::New ("")),
-          VarExpr::New ("provQuery_attr2")),
-        VarExpr::New ("prov_attr4")))));
 
   result = result->Select (Selector::New (
     Operation::New (RN_NEQ,
-      VarExpr::New ("prov_attr4"),
+      VarExpr::New ("provRoot_attr3"),
       VarExpr::New ("provQuery_attr3"))));
 
-  result = result->Project (
-    RULEQUERY,
-    strlist ("prov_attr3",
-      "NQID",
-      "prov_attr4",
-      "provQuery_attr1",
-      "prov_attr3"),
-    strlist ("ruleQuery_attr1",
-      "ruleQuery_attr2",
-      "ruleQuery_attr3",
-      "ruleQuery_attr4",
-      RN_DEST));
+  result = AggWrapList::New ()->Compute (result, provQuery, "provRoot_attr3");
 
-  Send (result);
+  result = result->Project (
+    PQLIST,
+    strlist ("provQuery_attr1",
+      "provQuery_attr2",
+      "list"),
+    strlist ("pQList_attr1",
+      "pQList_attr2",
+      "pQList_attr3"));
+
+  Insert (result);
 }
 
 void
-PktfwdNormDistHlistRmitmQuery::Rtdb2_eca (Ptr<Tuple> provQuery)
+PktfwdNormDistHlistRmitmQuery::Idb2_eca (Ptr<Tuple> provQuery)
 {
-  RAPIDNET_LOG_INFO ("Rtdb2_eca triggered");
+  RAPIDNET_LOG_INFO ("Idb2_eca triggered");
 
   Ptr<Tuple> result = provQuery;
 
@@ -1008,9 +1365,137 @@ PktfwdNormDistHlistRmitmQuery::Rtdb2_eca (Ptr<Tuple> provQuery)
 }
 
 void
-PktfwdNormDistHlistRmitmQuery::Rtdb3_eca (Ptr<Tuple> rReturn)
+PktfwdNormDistHlistRmitmQuery::Idb3_eca (Ptr<Tuple> provQuery)
 {
-  RAPIDNET_LOG_INFO ("Rtdb3_eca triggered");
+  RAPIDNET_LOG_INFO ("Idb3_eca triggered");
+
+  Ptr<Tuple> result = provQuery;
+
+  result->Assign (Assignor::New ("N",
+    ValueExpr::New (Int32Value::New (1))));
+
+  result = result->Project (
+    PITERATE,
+    strlist ("provQuery_attr1",
+      "provQuery_attr2",
+      "N"),
+    strlist ("pIterate_attr1",
+      "pIterate_attr2",
+      "pIterate_attr3"));
+
+  SendLocal (result);
+}
+
+void
+PktfwdNormDistHlistRmitmQuery::Idb4_eca (Ptr<Tuple> pIterate)
+{
+  RAPIDNET_LOG_INFO ("Idb4_eca triggered");
+
+  Ptr<RelationBase> result;
+
+  result = GetRelation (PQLIST)->Join (
+    pIterate,
+    strlist ("pQList_attr2", "pQList_attr1"),
+    strlist ("pIterate_attr2", "pIterate_attr1"));
+
+  result->Assign (Assignor::New ("N",
+    Operation::New (RN_PLUS,
+      VarExpr::New ("pIterate_attr3"),
+      ValueExpr::New (Int32Value::New (1)))));
+
+  result = result->Select (Selector::New (
+    Operation::New (RN_LT,
+      VarExpr::New ("pIterate_attr3"),
+      FSize::New (
+        VarExpr::New ("pQList_attr3")))));
+
+  result = result->Project (
+    PITERATE,
+    strlist ("pIterate_attr1",
+      "pIterate_attr2",
+      "N"),
+    strlist ("pIterate_attr1",
+      "pIterate_attr2",
+      "pIterate_attr3"));
+
+  SendLocal (result);
+}
+
+void
+PktfwdNormDistHlistRmitmQuery::Idb5_eca (Ptr<Tuple> pIterate)
+{
+  RAPIDNET_LOG_INFO ("Idb5_eca triggered");
+
+  Ptr<RelationBase> result;
+
+  result = GetRelation (PQLIST)->Join (
+    pIterate,
+    strlist ("pQList_attr2", "pQList_attr1"),
+    strlist ("pIterate_attr2", "pIterate_attr1"));
+
+  result->Assign (Assignor::New ("RID",
+    FItem::New (
+      VarExpr::New ("pQList_attr3"),
+      VarExpr::New ("pIterate_attr3"))));
+
+  result->Assign (Assignor::New ("NQID",
+    FSha1::New (
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          ValueExpr::New (StrValue::New ("")),
+          VarExpr::New ("pIterate_attr2")),
+        VarExpr::New ("RID")))));
+
+  result = result->Select (Selector::New (
+    Operation::New (RN_LTE,
+      VarExpr::New ("pIterate_attr3"),
+      FSize::New (
+        VarExpr::New ("pQList_attr3")))));
+
+  result = result->Project (
+    ERULEQUERY,
+    strlist ("pIterate_attr1",
+      "NQID",
+      "RID"),
+    strlist ("eRuleQuery_attr1",
+      "eRuleQuery_attr2",
+      "eRuleQuery_attr3"));
+
+  SendLocal (result);
+}
+
+void
+PktfwdNormDistHlistRmitmQuery::Idb6_eca (Ptr<Tuple> eRuleQuery)
+{
+  RAPIDNET_LOG_INFO ("Idb6_eca triggered");
+
+  Ptr<RelationBase> result;
+
+  result = GetRelation (PROVROOT)->Join (
+    eRuleQuery,
+    strlist ("provRoot_attr3", "provRoot_attr1"),
+    strlist ("eRuleQuery_attr3", "eRuleQuery_attr1"));
+
+  result = result->Project (
+    RULEQUERY,
+    strlist ("provRoot_attr4",
+      "eRuleQuery_attr2",
+      "eRuleQuery_attr3",
+      "eRuleQuery_attr1",
+      "provRoot_attr4"),
+    strlist ("ruleQuery_attr1",
+      "ruleQuery_attr2",
+      "ruleQuery_attr3",
+      "ruleQuery_attr4",
+      RN_DEST));
+
+  Send (result);
+}
+
+void
+PktfwdNormDistHlistRmitmQuery::Idb7_eca (Ptr<Tuple> rReturn)
+{
+  RAPIDNET_LOG_INFO ("Idb7_eca triggered");
 
   Ptr<RelationBase> result;
 
@@ -1055,21 +1540,96 @@ PktfwdNormDistHlistRmitmQuery::Rtdb3_eca (Ptr<Tuple> rReturn)
 }
 
 void
-PktfwdNormDistHlistRmitmQuery::Rtdb4Eca0Ins (Ptr<Tuple> pResultTmp)
+PktfwdNormDistHlistRmitmQuery::Idb8Eca0Ins (Ptr<Tuple> pResultTmp)
 {
-  RAPIDNET_LOG_INFO ("Rtdb4Eca0Ins triggered");
+  RAPIDNET_LOG_INFO ("Idb8Eca0Ins triggered");
 
-  Ptr<Tuple> result = pResultTmp;
+  Ptr<RelationBase> result;
+
+  result = GetRelation (PQLIST)->Join (
+    pResultTmp,
+    strlist ("pQList_attr2", "pQList_attr1"),
+    strlist ("pResultTmp_attr2", "pResultTmp_attr1"));
+
+  result = result->Select (Selector::New (
+    Operation::New (RN_EQ,
+      FSize::New (
+        VarExpr::New ("pResultTmp_attr5")),
+      FSize::New (
+        VarExpr::New ("pQList_attr3")))));
+
+  result = result->Select (Selector::New (
+    Operation::New (RN_NEQ,
+      FSize::New (
+        VarExpr::New ("pResultTmp_attr5")),
+      ValueExpr::New (Int32Value::New (0)))));
+
+  result = result->Project (
+    EPRETURN,
+    strlist ("pResultTmp_attr1",
+      "pResultTmp_attr2"),
+    strlist ("ePReturn_attr1",
+      "ePReturn_attr2"));
+
+  SendLocal (result);
+}
+
+void
+PktfwdNormDistHlistRmitmQuery::Idb8Eca1Ins (Ptr<Tuple> pQList)
+{
+  RAPIDNET_LOG_INFO ("Idb8Eca1Ins triggered");
+
+  Ptr<RelationBase> result;
+
+  result = GetRelation (PRESULTTMP)->Join (
+    pQList,
+    strlist ("pResultTmp_attr2", "pResultTmp_attr1"),
+    strlist ("pQList_attr2", "pQList_attr1"));
+
+  result = result->Select (Selector::New (
+    Operation::New (RN_EQ,
+      FSize::New (
+        VarExpr::New ("pResultTmp_attr5")),
+      FSize::New (
+        VarExpr::New ("pQList_attr3")))));
+
+  result = result->Select (Selector::New (
+    Operation::New (RN_NEQ,
+      FSize::New (
+        VarExpr::New ("pResultTmp_attr5")),
+      ValueExpr::New (Int32Value::New (0)))));
+
+  result = result->Project (
+    EPRETURN,
+    strlist ("pQList_attr1",
+      "pQList_attr2"),
+    strlist ("ePReturn_attr1",
+      "ePReturn_attr2"));
+
+  SendLocal (result);
+}
+
+void
+PktfwdNormDistHlistRmitmQuery::Idb9_eca (Ptr<Tuple> ePReturn)
+{
+  RAPIDNET_LOG_INFO ("Idb9_eca triggered");
+
+  Ptr<RelationBase> result;
+
+  result = GetRelation (PRESULTTMP)->Join (
+    ePReturn,
+    strlist ("pResultTmp_attr2", "pResultTmp_attr1"),
+    strlist ("ePReturn_attr2", "ePReturn_attr1"));
 
   result->Assign (Assignor::New ("Prov",
     FPIdb::New (
       VarExpr::New ("pResultTmp_attr5"),
-      VarExpr::New ("pResultTmp_attr1"))));
+      VarExpr::New ("ePReturn_attr1"))));
 
   result = result->Project (
     PRETURN,
     strlist ("pResultTmp_attr3",
-      "pResultTmp_attr2",
+      "ePReturn_attr2",
       "pResultTmp_attr4",
       "Prov",
       "pResultTmp_attr3"),
@@ -1124,7 +1684,7 @@ PktfwdNormDistHlistRmitmQuery::Rv2_eca (Ptr<Tuple> ruleQuery)
         Operation::New (RN_PLUS,
           ValueExpr::New (StrValue::New ("")),
           VarExpr::New ("ruleQuery_attr2")),
-        VarExpr::New ("VID")))));
+        VarExpr::New ("ruleExec_attr6")))));
 
   result = result->Select (Selector::New (
     Operation::New (RN_NEQ,
@@ -1137,7 +1697,7 @@ PktfwdNormDistHlistRmitmQuery::Rv2_eca (Ptr<Tuple> ruleQuery)
     strlist ("ruleExec_attr5",
       "NQID",
       "ruleExec_attr6",
-      "ruleQuery_attr4",
+      "ruleQuery_attr1",
       "ruleExec_attr5"),
     strlist ("ruleQuery_attr1",
       "ruleQuery_attr2",
@@ -1166,7 +1726,7 @@ PktfwdNormDistHlistRmitmQuery::Rv3_eca (Ptr<Tuple> ruleQuery)
         Operation::New (RN_PLUS,
           ValueExpr::New (StrValue::New ("")),
           VarExpr::New ("ruleQuery_attr2")),
-        VarExpr::New ("VID")))));
+        VarExpr::New ("ruleExec_attr6")))));
 
   result->Assign (Assignor::New ("Itm",
     ValueExpr::New (Int32Value::New (0))));
@@ -1211,7 +1771,7 @@ PktfwdNormDistHlistRmitmQuery::Rv4_eca (Ptr<Tuple> ruleQuery)
         Operation::New (RN_PLUS,
           ValueExpr::New (StrValue::New ("")),
           VarExpr::New ("ruleQuery_attr2")),
-        VarExpr::New ("VID")))));
+        VarExpr::New ("ruleExec_attr6")))));
 
   result->Assign (Assignor::New ("Itm",
     ValueExpr::New (Int32Value::New (1))));
@@ -1334,6 +1894,9 @@ PktfwdNormDistHlistRmitmQuery::Rv8_eca (Ptr<Tuple> rIterate)
     strlist ("rQList_attr2", "rQList_attr1"),
     strlist ("rIterate_attr2", "rIterate_attr1"));
 
+  result->Assign (Assignor::New ("$1",
+    VarExpr::New ("rIterate_attr1")));
+
   result->Assign (Assignor::New ("VID",
     FItem::New (
       VarExpr::New ("rQList_attr3"),
@@ -1351,10 +1914,12 @@ PktfwdNormDistHlistRmitmQuery::Rv8_eca (Ptr<Tuple> rIterate)
     BASEQUERY,
     strlist ("rIterate_attr1",
       "NQID",
-      "VID"),
+      "VID",
+      "$1"),
     strlist ("baseQuery_attr1",
       "baseQuery_attr2",
-      "baseQuery_attr3"));
+      "baseQuery_attr3",
+      "baseQuery_attr4"));
 
   SendLocal (result);
 }
@@ -1415,8 +1980,8 @@ PktfwdNormDistHlistRmitmQuery::Rv10_eca (Ptr<Tuple> rReturn)
 
   result = GetRelation (RRESULTTMP)->Join (
     rReturn,
-    strlist ("rResultTmp_attr2", "rResultTmp_attr4", "rResultTmp_attr1"),
-    strlist ("rReturn_attr2", "rReturn_attr3", "rReturn_attr1"));
+    strlist ("rResultTmp_attr1"),
+    strlist ("rReturn_attr1"));
 
   result->Assign (Assignor::New ("Buf2",
     FAppend::New (
@@ -1429,20 +1994,20 @@ PktfwdNormDistHlistRmitmQuery::Rv10_eca (Ptr<Tuple> rReturn)
 
   result = result->Select (Selector::New (
     Operation::New (RN_EQ,
-      VarExpr::New ("NQID"),
+      VarExpr::New ("rReturn_attr2"),
       FSha1::New (
         Operation::New (RN_PLUS,
           Operation::New (RN_PLUS,
             ValueExpr::New (StrValue::New ("")),
-            VarExpr::New ("rReturn_attr2")),
+            VarExpr::New ("rResultTmp_attr2")),
           VarExpr::New ("rReturn_attr3"))))));
 
   result = result->Project (
     RRESULTTMP,
     strlist ("rReturn_attr1",
-      "rReturn_attr2",
+      "rResultTmp_attr2",
       "rResultTmp_attr3",
-      "rReturn_attr3",
+      "rResultTmp_attr4",
       "Buf"),
     strlist ("rResultTmp_attr1",
       "rResultTmp_attr2",
@@ -1730,5 +2295,156 @@ PktfwdNormDistHlistRmitmQuery::Rv13_eca (Ptr<Tuple> eRReturn)
       RN_DEST));
 
   Send (result);
+}
+
+void
+PktfwdNormDistHlistRmitmQuery::Q1_eca (Ptr<Tuple> recvPacket)
+{
+  RAPIDNET_LOG_INFO ("Q1_eca triggered");
+
+  Ptr<RelationBase> result;
+
+  result = GetRelation (RECORDSD)->Join (
+    recvPacket,
+    strlist ("recordSD_attr3", "recordSD_attr1", "recordSD_attr2"),
+    strlist ("recvPacket_attr3", "recvPacket_attr1", "recvPacket_attr2"));
+
+  result = AggWrapCount::New ()->Compute (result, recvPacket);
+
+  result = result->Project (
+    RECVCOUNT,
+    strlist ("recvPacket_attr1",
+      "recvPacket_attr2",
+      "recvPacket_attr3",
+      "recvPacket_attr4",
+      "count"),
+    strlist ("recvCount_attr1",
+      "recvCount_attr2",
+      "recvCount_attr3",
+      "recvCount_attr4",
+      "recvCount_attr5"));
+
+  SendLocal (result);
+}
+
+void
+PktfwdNormDistHlistRmitmQuery::Q2_eca (Ptr<Tuple> recvCount)
+{
+  RAPIDNET_LOG_INFO ("Q2_eca triggered");
+
+  Ptr<Tuple> result = recvCount;
+
+  result = result->Select (Selector::New (
+    Operation::New (RN_EQ,
+      VarExpr::New ("recvCount_attr5"),
+      ValueExpr::New (Int32Value::New (0)))));
+
+  result = result->Project (
+    RECORDSD,
+    strlist ("recvCount_attr1",
+      "recvCount_attr2",
+      "recvCount_attr3"),
+    strlist ("recordSD_attr1",
+      "recordSD_attr2",
+      "recordSD_attr3"));
+
+  Insert (result);
+}
+
+void
+PktfwdNormDistHlistRmitmQuery::Q3_eca (Ptr<Tuple> recvCount)
+{
+  RAPIDNET_LOG_INFO ("Q3_eca triggered");
+
+  Ptr<Tuple> result = recvCount;
+
+  result->Assign (Assignor::New ("Time",
+    FNow::New (
+)));
+
+  result->Assign (Assignor::New ("UID",
+    FSha1::New (
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          Operation::New (RN_PLUS,
+            Operation::New (RN_PLUS,
+              ValueExpr::New (StrValue::New ("recvPacket")),
+              VarExpr::New ("recvCount_attr1")),
+            VarExpr::New ("recvCount_attr2")),
+          VarExpr::New ("recvCount_attr3")),
+        VarExpr::New ("recvCount_attr4")))));
+
+  result->Assign (Assignor::New ("QID",
+    FSha1::New (
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          ValueExpr::New (StrValue::New ("")),
+          VarExpr::New ("UID")),
+        VarExpr::New ("Time")))));
+
+  result = result->Select (Selector::New (
+    Operation::New (RN_EQ,
+      VarExpr::New ("recvCount_attr5"),
+      ValueExpr::New (Int32Value::New (0)))));
+
+  result = result->Project (
+    INITPROVQUERY,
+    strlist ("recvCount_attr1",
+      "QID",
+      "UID",
+      "recvCount_attr3"),
+    strlist ("initProvQuery_attr1",
+      "initProvQuery_attr2",
+      "initProvQuery_attr3",
+      "initProvQuery_attr4"));
+
+  Insert (result);
+}
+
+void
+PktfwdNormDistHlistRmitmQuery::Q4Eca0Ins (Ptr<Tuple> initProvQuery)
+{
+  RAPIDNET_LOG_INFO ("Q4Eca0Ins triggered");
+
+  Ptr<Tuple> result = initProvQuery;
+
+  result = result->Project (
+    PROVQUERY,
+    strlist ("initProvQuery_attr1",
+      "initProvQuery_attr2",
+      "initProvQuery_attr3",
+      "initProvQuery_attr4"),
+    strlist ("provQuery_attr1",
+      "provQuery_attr2",
+      "provQuery_attr3",
+      "provQuery_attr4"));
+
+  SendLocal (result);
+}
+
+void
+PktfwdNormDistHlistRmitmQuery::Q5_eca (Ptr<Tuple> pReturn)
+{
+  RAPIDNET_LOG_INFO ("Q5_eca triggered");
+
+  Ptr<RelationBase> result;
+
+  result = GetRelation (INITPROVQUERY)->Join (
+    pReturn,
+    strlist ("initProvQuery_attr1", "initProvQuery_attr2", "initProvQuery_attr3"),
+    strlist ("pReturn_attr1", "pReturn_attr2", "pReturn_attr3"));
+
+  result = result->Project (
+    RECORDPROV,
+    strlist ("pReturn_attr1",
+      "pReturn_attr2",
+      "pReturn_attr3",
+      "pReturn_attr4"),
+    strlist ("recordProv_attr1",
+      "recordProv_attr2",
+      "recordProv_attr3",
+      "recordProv_attr4"));
+
+  SendLocal (result);
 }
 

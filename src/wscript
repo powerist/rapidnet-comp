@@ -18,6 +18,7 @@ all_modules = (
     'contrib',
     'node',
     'internet-stack',
+    'l4-platform',
     'devices/point-to-point',
     'devices/csma',
     'devices/emu',
@@ -28,15 +29,30 @@ all_modules = (
     'applications/packet-sink',
     'applications/udp-echo',
     'applications/myproto',
+    
+    'applications/pktfwd-norm-prov-enabled',
+    'applications/pktfwd-norm-dhlist-layerhs-online',
+
+    'applications/pktfwd-norm-dist-hlist-online',
+    'applications/pktfwd-norm-dist-hlist-rmitm',
 
     'applications/dns',
     'applications/dns-prov',
     'applications/dns-prov-comp-strawman',
     'applications/dns-prov-comp-online',
     
+    'applications/dns-prov-dhlist-layerhs-online',
+    'applications/dns-prov-dist-hlist-rmitm',
+
     'applications/pktfwd-norm-prov-ete',
     'applications/pktfwd-norm-prov-comp-online-ete',
     'applications/pktfwd-norm-prov-comp-strawman-ete',
+
+    'applications/pktfwd-norm-prov-query',
+    'applications/pktfwd-norm-dist-hlist-rmitm-query',
+    'applications/pktfwd-norm-dhlist-layerhs-online-query',
+
+    'applications/pingpong-l4',
     
     'routing/olsr',
     'routing/global-routing',

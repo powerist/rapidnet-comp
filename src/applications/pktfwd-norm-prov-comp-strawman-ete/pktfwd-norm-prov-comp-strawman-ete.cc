@@ -140,9 +140,13 @@ PktfwdNormProvCompStrawmanEte::DemuxRecv (Ptr<Tuple> tuple)
     {
       Prov_rh1_1Eca0Ins (tuple);
     }
-  if (IsInsertEvent (tuple, LINKHR))
+  if (IsInsertEvent (tuple, FLOWENTRY))
     {
       Prov_rh1_1Eca1Ins (tuple);
+    }
+  if (IsInsertEvent (tuple, LINK))
+    {
+      Prov_rh1_1Eca2Ins (tuple);
     }
   if (IsRecvEvent (tuple, PACKET))
     {
@@ -355,10 +359,15 @@ PktfwdNormProvCompStrawmanEte::Prov_rh1_1Eca0Ins (Ptr<Tuple> initPacket)
 
   Ptr<RelationBase> result;
 
-  result = GetRelation (LINKHR)->Join (
+  result = GetRelation (FLOWENTRY)->Join (
     initPacket,
-    strlist ("linkhr_attr1"),
-    strlist ("initPacket_attr1"));
+    strlist ("flowEntry_attr2", "flowEntry_attr1"),
+    strlist ("initPacket_attr3", "initPacket_attr1"));
+
+  result = GetRelation (LINK)->Join (
+    result,
+    strlist ("link_attr2", "link_attr1"),
+    strlist ("flowEntry_attr3", "initPacket_attr1"));
 
   result->Assign (Assignor::New ("PIDev",
     FSha1::New (
@@ -380,9 +389,9 @@ PktfwdNormProvCompStrawmanEte::Prov_rh1_1Eca0Ins (Ptr<Tuple> initPacket)
     FSha1::New (
       Operation::New (RN_PLUS,
         Operation::New (RN_PLUS,
-          ValueExpr::New (StrValue::New ("linkhr")),
+          ValueExpr::New (StrValue::New ("link")),
           VarExpr::New ("initPacket_attr1")),
-        VarExpr::New ("linkhr_attr2")))));
+        VarExpr::New ("flowEntry_attr3")))));
 
   result->Assign (Assignor::New ("List",
     FAppend::New (
@@ -405,7 +414,7 @@ PktfwdNormProvCompStrawmanEte::Prov_rh1_1Eca0Ins (Ptr<Tuple> initPacket)
   result = result->Project (
     EPACKETTEMP,
     strlist ("RLOC",
-      "linkhr_attr2",
+      "flowEntry_attr3",
       "initPacket_attr2",
       "initPacket_attr3",
       "initPacket_attr4",
@@ -429,16 +438,21 @@ PktfwdNormProvCompStrawmanEte::Prov_rh1_1Eca0Ins (Ptr<Tuple> initPacket)
 }
 
 void
-PktfwdNormProvCompStrawmanEte::Prov_rh1_1Eca1Ins (Ptr<Tuple> linkhr)
+PktfwdNormProvCompStrawmanEte::Prov_rh1_1Eca1Ins (Ptr<Tuple> flowEntry)
 {
   RAPIDNET_LOG_INFO ("Prov_rh1_1Eca1Ins triggered");
 
   Ptr<RelationBase> result;
 
   result = GetRelation (INITPACKET)->Join (
-    linkhr,
-    strlist ("initPacket_attr1"),
-    strlist ("linkhr_attr1"));
+    flowEntry,
+    strlist ("initPacket_attr3", "initPacket_attr1"),
+    strlist ("flowEntry_attr2", "flowEntry_attr1"));
+
+  result = GetRelation (LINK)->Join (
+    result,
+    strlist ("link_attr2", "link_attr1"),
+    strlist ("flowEntry_attr3", "flowEntry_attr1"));
 
   result->Assign (Assignor::New ("PIDev",
     FSha1::New (
@@ -447,9 +461,9 @@ PktfwdNormProvCompStrawmanEte::Prov_rh1_1Eca1Ins (Ptr<Tuple> linkhr)
           Operation::New (RN_PLUS,
             Operation::New (RN_PLUS,
               ValueExpr::New (StrValue::New ("initPacket")),
-              VarExpr::New ("linkhr_attr1")),
+              VarExpr::New ("flowEntry_attr1")),
             VarExpr::New ("initPacket_attr2")),
-          VarExpr::New ("initPacket_attr3")),
+          VarExpr::New ("flowEntry_attr2")),
         VarExpr::New ("initPacket_attr4")))));
 
   result->Assign (Assignor::New ("HashList",
@@ -460,16 +474,16 @@ PktfwdNormProvCompStrawmanEte::Prov_rh1_1Eca1Ins (Ptr<Tuple> linkhr)
     FSha1::New (
       Operation::New (RN_PLUS,
         Operation::New (RN_PLUS,
-          ValueExpr::New (StrValue::New ("linkhr")),
-          VarExpr::New ("linkhr_attr1")),
-        VarExpr::New ("linkhr_attr2")))));
+          ValueExpr::New (StrValue::New ("link")),
+          VarExpr::New ("flowEntry_attr1")),
+        VarExpr::New ("flowEntry_attr3")))));
 
   result->Assign (Assignor::New ("List",
     FAppend::New (
       VarExpr::New ("PID2"))));
 
   result->Assign (Assignor::New ("RLOC",
-    VarExpr::New ("linkhr_attr1")));
+    VarExpr::New ("flowEntry_attr1")));
 
   result->Assign (Assignor::New ("R",
     ValueExpr::New (StrValue::New ("rh1"))));
@@ -485,7 +499,92 @@ PktfwdNormProvCompStrawmanEte::Prov_rh1_1Eca1Ins (Ptr<Tuple> linkhr)
   result = result->Project (
     EPACKETTEMP,
     strlist ("RLOC",
-      "linkhr_attr2",
+      "flowEntry_attr3",
+      "initPacket_attr2",
+      "flowEntry_attr2",
+      "initPacket_attr4",
+      "RID",
+      "R",
+      "List",
+      "HashList",
+      "RLOC"),
+    strlist ("epacketTemp_attr1",
+      "epacketTemp_attr2",
+      "epacketTemp_attr3",
+      "epacketTemp_attr4",
+      "epacketTemp_attr5",
+      "epacketTemp_attr6",
+      "epacketTemp_attr7",
+      "epacketTemp_attr8",
+      "epacketTemp_attr9",
+      RN_DEST));
+
+  Send (result);
+}
+
+void
+PktfwdNormProvCompStrawmanEte::Prov_rh1_1Eca2Ins (Ptr<Tuple> link)
+{
+  RAPIDNET_LOG_INFO ("Prov_rh1_1Eca2Ins triggered");
+
+  Ptr<RelationBase> result;
+
+  result = GetRelation (INITPACKET)->Join (
+    link,
+    strlist ("initPacket_attr1"),
+    strlist ("link_attr1"));
+
+  result = GetRelation (FLOWENTRY)->Join (
+    result,
+    strlist ("flowEntry_attr2", "flowEntry_attr3", "flowEntry_attr1"),
+    strlist ("initPacket_attr3", "link_attr2", "link_attr1"));
+
+  result->Assign (Assignor::New ("PIDev",
+    FSha1::New (
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          Operation::New (RN_PLUS,
+            Operation::New (RN_PLUS,
+              ValueExpr::New (StrValue::New ("initPacket")),
+              VarExpr::New ("link_attr1")),
+            VarExpr::New ("initPacket_attr2")),
+          VarExpr::New ("initPacket_attr3")),
+        VarExpr::New ("initPacket_attr4")))));
+
+  result->Assign (Assignor::New ("HashList",
+    FAppend::New (
+      VarExpr::New ("PIDev"))));
+
+  result->Assign (Assignor::New ("PID2",
+    FSha1::New (
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          ValueExpr::New (StrValue::New ("link")),
+          VarExpr::New ("link_attr1")),
+        VarExpr::New ("link_attr2")))));
+
+  result->Assign (Assignor::New ("List",
+    FAppend::New (
+      VarExpr::New ("PID2"))));
+
+  result->Assign (Assignor::New ("RLOC",
+    VarExpr::New ("link_attr1")));
+
+  result->Assign (Assignor::New ("R",
+    ValueExpr::New (StrValue::New ("rh1"))));
+
+  result->Assign (Assignor::New ("RID",
+    FSha1::New (
+      Operation::New (RN_PLUS,
+        Operation::New (RN_PLUS,
+          VarExpr::New ("R"),
+          VarExpr::New ("RLOC")),
+        VarExpr::New ("List")))));
+
+  result = result->Project (
+    EPACKETTEMP,
+    strlist ("RLOC",
+      "link_attr2",
       "initPacket_attr2",
       "initPacket_attr3",
       "initPacket_attr4",

@@ -1,4 +1,6 @@
-ECA Rule r1Eca0Ins ACTION_LOCAL_SEND<request(@X, URL, HOST)> :- EVENT_INSERT<url(@X, URL, HOST)>.
-ECA Rule r2_eca ACTION_REMOTE_SEND<request(@ADDR, URL, HOST)> :- EVENT_RECV<request(@X, URL, HOST)>, name_server(@X, DOMAIN, SERVER), address_record(@X, SERVER, ADDR), f_indexof(URL, DOMAIN) != -1, URL != DOMAIN.
-ECA Rule r3ECAMat ACTION_ADD<result(@ADDR, URL, HOST)> :- EVENT_RECV<r3resultsend(@ADDR, URL, HOST)>.
-ECA Rule r3_eca ACTION_REMOTE_SEND<r3resultsend(@ADDR, URL, HOST)> :- EVENT_RECV<request(@X, URL, HOST)>, name_server(@X, DOMAIN, SERVER), address_record(@X, SERVER, ADDR), f_indexof(URL, DOMAIN) != -1, URL == DOMAIN.
+ECA Rule r1Eca0Ins ACTION_REMOTE_SEND<request(@ADDR, URL, HOST, REQUESTID)> :- EVENT_INSERT<url(@X, URL, HOST, REQUESTID)>, name_server(@X, DOMAIN, SERVER), address_record(@X, SERVER, ADDR), f_indexof(URL, DOMAIN) != -1, URL != DOMAIN.
+ECA Rule r1Eca1Ins ACTION_REMOTE_SEND<request(@ADDR, URL, HOST, REQUESTID)> :- EVENT_INSERT<name_server(@X, DOMAIN, SERVER)>, url(@X, URL, HOST, REQUESTID), address_record(@X, SERVER, ADDR), f_indexof(URL, DOMAIN) != -1, URL != DOMAIN.
+ECA Rule r1Eca2Ins ACTION_REMOTE_SEND<request(@ADDR, URL, HOST, REQUESTID)> :- EVENT_INSERT<address_record(@X, SERVER, ADDR)>, url(@X, URL, HOST, REQUESTID), name_server(@X, DOMAIN, SERVER), f_indexof(URL, DOMAIN) != -1, URL != DOMAIN.
+ECA Rule r2_eca ACTION_REMOTE_SEND<request(@ADDR, URL, HOST, REQUESTID)> :- EVENT_RECV<request(@X, URL, HOST, REQUESTID)>, name_server(@X, DOMAIN, SERVER), address_record(@X, SERVER, ADDR), f_indexof(URL, DOMAIN) != -1, URL != DOMAIN.
+ECA Rule r3ECAMat ACTION_ADD<result(@ADDR, URL, HOST, REQUESTID)> :- EVENT_RECV<r3resultsend(@ADDR, URL, HOST, REQUESTID)>.
+ECA Rule r3_eca ACTION_REMOTE_SEND<r3resultsend(@ADDR, URL, HOST, REQUESTID)> :- EVENT_RECV<request(@X, URL, HOST, REQUESTID)>, name_server(@X, DOMAIN, SERVER), address_record(@X, SERVER, ADDR), f_indexof(URL, DOMAIN) != -1, URL == DOMAIN.

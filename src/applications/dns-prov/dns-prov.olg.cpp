@@ -15,8 +15,12 @@ r00 prov(@REQUESTLOC,VID,RID,REQUESTLOC) :-
     RID := VID.
 
 /*Request Program*/
-prov_r1_1 eRequestTemp(@RLOC,X,URL,HOST,REQUESTID,RID,R,List) :-
+prov_r1_1 eRequestTemp(@RLOC,ADDR,URL,HOST,REQUESTID,RID,R,List) :-
     url(@X,URL,HOST,REQUESTID),
+    name_server(@X,DOMAIN,SERVER),
+    address_record(@X,SERVER,ADDR),
+    f_indexof(URL,DOMAIN)!=-1,
+    URL!=DOMAIN,
     PID1 := f_sha1(("url"+X)+URL+HOST+REQUESTID),
     List := f_append(PID1),
     RLOC := X,

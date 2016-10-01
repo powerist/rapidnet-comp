@@ -1,0 +1,3 @@
+./scripts/bash_scripts/dns_scale_numURLs.sh dns-prov-Scale-URLs-test /localdrive1/harshal/dns/storage_urls/dns_storage_nocomp /localdrive1/harshal/dns/storage_urls/storage_nocomp_200_5_35.txt 200 5 35 5
+./scripts/bash_scripts/dns_scale_numURLs.sh dns-prov-dist-hlist-rmitm-Scale-URLs-test /localdrive1/harshal/dns/storage_urls/dns_storage_rmitm /localdrive1/harshal/dns/storage_urls/storage_rmitm_200_5_35.txt 200 5 35 5
+./scripts/bash_scripts/dns_scale_numURLs.sh dns-prov-dhlist-layerhs-online-Scale-URLs-test /localdrive1/harshal/dns/storage_urls/dns_storage_online /localdrive1/harshal/dns/storage_urls/storage_online_200_5_35.txt 200 5 35 5

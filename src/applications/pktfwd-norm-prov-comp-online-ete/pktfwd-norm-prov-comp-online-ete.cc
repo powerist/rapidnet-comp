@@ -521,10 +521,15 @@ PktfwdNormProvCompOnlineEte::Rh103_eca (Ptr<Tuple> initPacketCount)
 
   Ptr<RelationBase> result;
 
-  result = GetRelation (LINKHR)->Join (
+  result = GetRelation (FLOWENTRY)->Join (
     initPacketCount,
-    strlist ("linkhr_attr1"),
-    strlist ("initPacketCount_attr1"));
+    strlist ("flowEntry_attr2", "flowEntry_attr1"),
+    strlist ("initPacketCount_attr3", "initPacketCount_attr1"));
+
+  result = GetRelation (LINK)->Join (
+    result,
+    strlist ("link_attr2", "link_attr1"),
+    strlist ("flowEntry_attr3", "initPacketCount_attr1"));
 
   result->Assign (Assignor::New ("PIDev",
     FSha1::New (
@@ -558,12 +563,12 @@ PktfwdNormProvCompOnlineEte::Rh103_eca (Ptr<Tuple> initPacketCount)
 
   result = result->Project (
     PACKET,
-    strlist ("linkhr_attr2",
+    strlist ("flowEntry_attr3",
       "initPacketCount_attr2",
       "initPacketCount_attr3",
       "initPacketCount_attr4",
       "PIDHash",
-      "linkhr_attr2"),
+      "flowEntry_attr3"),
     strlist ("packet_attr1",
       "packet_attr2",
       "packet_attr3",
@@ -581,10 +586,15 @@ PktfwdNormProvCompOnlineEte::Prov_rh1_1_eca (Ptr<Tuple> initPacketCount)
 
   Ptr<RelationBase> result;
 
-  result = GetRelation (LINK)->Join (
+  result = GetRelation (FLOWENTRY)->Join (
     initPacketCount,
-    strlist ("link_attr1"),
-    strlist ("initPacketCount_attr1"));
+    strlist ("flowEntry_attr2", "flowEntry_attr1"),
+    strlist ("initPacketCount_attr3", "initPacketCount_attr1"));
+
+  result = GetRelation (LINK)->Join (
+    result,
+    strlist ("link_attr2", "link_attr1"),
+    strlist ("flowEntry_attr3", "initPacketCount_attr1"));
 
   result->Assign (Assignor::New ("PIDev",
     FSha1::New (
@@ -615,9 +625,9 @@ PktfwdNormProvCompOnlineEte::Prov_rh1_1_eca (Ptr<Tuple> initPacketCount)
     FSha1::New (
       Operation::New (RN_PLUS,
         Operation::New (RN_PLUS,
-          ValueExpr::New (StrValue::New ("linkhr")),
+          ValueExpr::New (StrValue::New ("link")),
           VarExpr::New ("initPacketCount_attr1")),
-        VarExpr::New ("link_attr2")))));
+        VarExpr::New ("flowEntry_attr3")))));
 
   result->Assign (Assignor::New ("List",
     FAppend::New (
@@ -645,7 +655,7 @@ PktfwdNormProvCompOnlineEte::Prov_rh1_1_eca (Ptr<Tuple> initPacketCount)
   result = result->Project (
     EPACKETTEMP,
     strlist ("RLOC",
-      "link_attr2",
+      "flowEntry_attr3",
       "initPacketCount_attr2",
       "initPacketCount_attr3",
       "initPacketCount_attr4",

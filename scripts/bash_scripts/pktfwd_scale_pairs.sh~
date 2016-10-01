@@ -1,0 +1,3 @@
+./scripts/bash_scripts/scale_pairs_gen.sh pktfwd-norm-large-scale-nocomp-ete-test $2 /localdrive1/harshal/Storage_VS_Pairs/storage_nocomp_500x1000.dat /localdrive1/harshal/Storage_VS_Pairs/pktfwd_storage_nocomp -1 500 $1
+./scripts/bash_scripts/scale_pairs_gen.sh pktfwd-large-scale-dist-hlist-rmitm-test $2 /localdrive1/harshal/Storage_VS_Pairs/storage_rmitm_500x1000.dat /localdrive1/harshal/Storage_VS_Pairs/pktfwd_storage_rmitm -1 500 $1
+./scripts/bash_scripts/scale_pairs_gen.sh pktfwd-large-scale-dhlist-layerhs-online-test $2 /localdrive1/harshal/Storage_VS_Pairs/storage_online_500x1000.dat /localdrive1/harshal/Storage_VS_Pairs/pktfwd_storage_online -1 500 $1
