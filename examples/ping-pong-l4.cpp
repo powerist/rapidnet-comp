@@ -83,7 +83,7 @@ main (int argc, char *argv[])
   nodeContainer.Create (1);
   L4PlatformHelper platform;
   platform.Install (nodeContainer);
-  PingpongHelper helper = PingpongHelper ();
+  PingpongL4Helper helper = PingpongL4Helper();
   helper.SetL4Platform (true);
   helper.SetAttribute ("RapidNetPort", UintegerValue (port));
   // Install ping pong
