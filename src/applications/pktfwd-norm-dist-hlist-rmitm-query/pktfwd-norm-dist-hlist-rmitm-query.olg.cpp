@@ -1,11 +1,13 @@
 /*Materialized table*/
 materialize(initPacket,infinity,infinity,keys(2,3,4:str)). /*Input packets at hosts*/
+
 /*materialize(recvPacket,infinity,infinity,keys(2,3,4:str)).*/
 materialize(link,infinity,infinity,keys(2)). /*Links between routers and other devices*/
 materialize(flowEntry,infinity,infinity,keys(2)). /*Links between routers and other devices*/
 
 /* Provenance tables*/
 materialize(ruleExec, infinity, infinity, keys(2:cid,5,6:cid)).
+
 materialize(prov, infinity, infinity, keys(2:cid,3:cid,4)).
 materialize(provRoot, infinity, infinity, keys(2:cid,3:cid,4)).
 
@@ -14,6 +16,7 @@ materialize(rResultTmp,infinity,infinity,keys(1,2:cid)).
 materialize(rQList,infinity,infinity,keys(1,2:cid)).
 materialize(pResultTmp,infinity,infinity,keys(1,2:cid)).
 materialize(childWait,infinity,infinity,keys(1,2:cid,3:cid)).
+
 materialize(pQList,infinity,infinity,keys(1,2:cid)).
 
 /*Tables for automatic provenance querying*/
@@ -109,10 +112,10 @@ prov_rh2_2 ruleExec(@RLOC, RID, R, List, PreLoc, PreRID) :-
 prov_rh2_3 recvPacket(@Node, SrcAdd, DstAdd, Data, RID, RLOC) :-
     erecvPacketTemp(@RLOC, Node, SrcAdd, DstAdd, Data, RID, R, List, PreInfolist).
 
+
 prov_rh2_5 provRoot(@Node, VID, RID, RLOC) :-
     recvPacket(@Node, SrcAdd, DstAdd, Data, RID, RLOC),
     VID := f_sha1(((("recvPacket"+ Node)+ SrcAdd)+ DstAdd)+ Data).
-
 
 
 /* Query program */
@@ -122,6 +125,7 @@ prov_rh2_5 provRoot(@Node, VID, RID, RLOC) :-
 edb1 baseReturn(@Ret,QID,VID,Prov) :- baseQuery(@X,QID,VID,Ret), Prov:=f_pEDB(VID,X).
 
 /* root vertex */
+
 idb1 pQList(@X,QID,a_LIST<RID>) :- provQuery(@X,QID,VID,Ret),
        provRoot(@X,VID,RID,RLoc), RID!=VID.
 idb2 pResultTmp(@X,QID,Ret,VID,Buf) :-
@@ -152,6 +156,7 @@ idb9 pReturn(@Ret,QID,VID,Prov) :- ePReturn(@X,QID),
 /* Rule Vertex */
 rv1 rQList(@X,QID,List) :- ruleQuery(@X,QID,RID,Ret),
       ruleExec(@X,RID,R,List, PreLoc, PreRID).
+
 
 rv2 ruleQuery(@PreLoc,NQID,PreRID,X) :- ruleQuery(@X,QID,RID,Ret),
  ruleExec(@X,RID,R,List, PreLoc, PreRID),

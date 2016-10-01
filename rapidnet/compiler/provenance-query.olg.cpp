@@ -24,7 +24,7 @@ idb4 pIterate(@X,QID,N) :- pIterate(@X,QID,N1),
 idb5 eRuleQuery(@X,NQID,RID) :- pIterate(@X,QID,N),
        pQList(@X,QID,List), N<=f_size(List),
        RID:=f_item(List,N), NQID:=f_sha1(""+QID+RID).
-idb6 ruleQuery(@RLoc,QID,RID,X) :- eRuleQuery(@X,QID,RID),
+idb6 ruleQuery(@RLoc,NQID,RID,X) :- eRuleQuery(@X,NQID,RID),
        prov(@X,VID,RID,RLoc).
 
 idb7 pResultTmp(@X,QID,Ret,VID,Buf) :- rReturn(@X,NQID,RID,Prov),
@@ -39,26 +39,26 @@ idb9 pReturn(@Ret,QID,VID,Prov) :- ePReturn(@X,QID),
        pResultTmp(@X,QID,Ret,VID,Buf), Prov:=f_pIDB(Buf,X).
 
 /* Rule Vertex */
-rv1 rQList(@X,QID,List) :- ruleQuery(@X,QID,RID,Ret),
+rv1 rQList(@X,NQID,List) :- ruleQuery(@X,NQID,RID,Ret),
       ruleExec(@X,RID,R,List).
-rv2 rResultTmp(@X,QID,Ret,RID,Buf) :-
-      ruleQuery(@X,QID,RID,Ret), Buf:=f_empty().
+rv2 rResultTmp(@X,NQID,Ret,RID,Buf) :-
+      ruleQuery(@X,NQID,RID,Ret), Buf:=f_empty().
 
-rv3 rIterate(@X,QID,N) :- ruleQuery(@X,QID,RID,Ret), N:=1.
-rv4 rIterate(@X,QID,N) :- rIterate(@X,QID,N1),
-      rQList(@X,QID,List), N1<f_size(List), N:=N1+1.
+rv3 rIterate(@X,NQID,N) :- ruleQuery(@X,NQID,RID,Ret), N:=1.
+rv4 rIterate(@X,NQID,N) :- rIterate(@X,NQID,N1),
+      rQList(@X,NQID,List), N1<f_size(List), N:=N1+1.
 
-rv5 eProvQuery(@X,NQID,VID) :- rIterate(@X,QID,N),
-      rQList(@X,QID,List),
-      VID:=f_item(List,N), NQID:=f_sha1(""+QID+VID).
-rv6 provQuery(@X,QID,VID,X) :- eProvQuery(@X,QID,VID).
+rv5 eProvQuery(@X,NNQID,VID) :- rIterate(@X,NQID,N),
+      rQList(@X,NQID,List),
+      VID:=f_item(List,N), NNQID:=f_sha1(""+NQID+VID).
+rv6 provQuery(@X,NNQID,VID,X) :- eProvQuery(@X,NNQID,VID).
 
-rv7 rResultTmp(@X,QID,Ret,RID,Buf) :- pReturn(@X,NQID,VID,Prov),
-      rResultTmp(@X,QID,Ret,RID,Buf1), NQID==f_sha1(""+QID+VID),
+rv7 rResultTmp(@X,NQID,Ret,RID,Buf) :- pReturn(@X,NNQID,VID,Prov),
+      rResultTmp(@X,NQID,Ret,RID,Buf1), NNQID==f_sha1(""+NQID+VID),
       Buf2:=f_append(Prov), Buf:=f_concat(Buf1,Buf2).
 
-rv8 eRReturn(@X,QID) :- rResultTmp(@X,QID,Ret,RID,Buf),
-      rQList(@X,QID,List), f_size(Buf)==f_size(List).
-rv9 rReturn(@Ret,QID,RID,Prov) :- eRReturn(@X,QID),
-      rResultTmp(@X,QID,Ret,RID,Buf),
+rv8 eRReturn(@X,NQID) :- rResultTmp(@X,NQID,Ret,RID,Buf),
+      rQList(@X,NQID,List), f_size(Buf)==f_size(List).
+rv9 rReturn(@Ret,NQID,RID,Prov) :- eRReturn(@X,NQID),
+      rResultTmp(@X,NQID,Ret,RID,Buf),
       ruleExec(@X,RID,R,List), Prov:=f_pRULE(Buf,X,R).

@@ -1,6 +1,6 @@
-# project ns (3.5) configured on Fri Sep 30 14:10:26 2016 by
+# project ns (3.5) configured on Sat Oct  1 14:21:55 2016 by
 # waf 1.5.8 (abi 7, python 20703f0 on linux2)
-# using ./waf
+# using ./waf --run rapidnet-compiler --command-template= %s --ndlog=src/applications/pktfwd-norm-dist-hlist-rmitm-query/pktfwd-norm-dist-hlist-rmitm-query.olg --base-ndlog=RapidNetApplicationBase --provenance=0
 #
 Checking for program g++
 

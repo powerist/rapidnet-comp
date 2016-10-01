@@ -113,6 +113,8 @@ all_modules = (
     'applications/pktfwd-norm-bdfair-prov',
     'applications/pktfwd-norm-bdfair-prov-comp-strawman',
     'applications/pktfwd-norm-bdfair-prov-comp-online',
+    'applications/pktfwd-norm-no-device',
+    'applications/pktfwd-norm-nodev-provquery',
     )
 
 def set_options(opt):

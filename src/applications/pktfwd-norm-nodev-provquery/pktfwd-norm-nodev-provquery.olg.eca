@@ -1,0 +1,2 @@
+ECA Rule rq1Eca0Ins ACTION_REMOTE_SEND<provQuery(@Loc, QID, VID, Ret)> :- EVENT_INSERT<tuple(@Ret, Name, Loc, Src, Dst, Data)>, VID := f_sha1((((Name+ Loc)+ Src)+ Dst)+ Data), Time := f_now(), QID := f_sha1((+ VID)+ Time).
+ECA Rule rq2_eca ACTION_ADD<records(@Ret, QID, RID, Prov)> :- EVENT_RECV<pReturn(@Ret, QID, RID, Prov)>.

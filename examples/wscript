@@ -474,3 +474,7 @@ def build(bld):
 
     obj = bld.create_ns3_program('ping-pong-l4-test')
     obj.source = 'ping-pong-l4.cpp'
+
+    obj = bld.create_ns3_program('pktfwd-norm-no-device-test')
+    obj.source = 'pktfwd-norm-no-device-test.cc'
+
