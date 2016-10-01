@@ -1,0 +1,476 @@
+## -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
+
+def build(bld):
+    obj = bld.create_ns3_program('hello-simulator')
+    obj.source = 'hello-simulator.cc'
+        
+    obj = bld.create_ns3_program('first',
+                                 ['core', 'simulator', 'point-to-point', 'internet-stack'])
+    obj.source = 'first.cc'
+        
+    obj = bld.create_ns3_program('second',
+                                 ['core', 'simulator', 'point-to-point', 'csma', 'internet-stack'])
+    obj.source = 'second.cc'
+        
+    obj = bld.create_ns3_program('third',
+                                 ['core', 'simulator', 'point-to-point', 'csma', 'wifi', 'internet-stack'])
+    obj.source = 'third.cc'
+        
+    obj = bld.create_ns3_program('object-names',
+                                 ['core', 'simulator', 'csma', 'internet-stack'])
+    obj.source = 'object-names.cc'
+        
+    obj = bld.create_ns3_program('mixed-wireless',
+                                 ['core', 'simulator', 'mobility', 'wifi', 'point-to-point', 'internet-stack'])
+    obj.source = 'mixed-wireless.cc'
+
+    obj = bld.create_ns3_program('dynamic-global-routing',
+                                 ['point-to-point', 'csma', 'internet-stack', 'global-routing'])
+    obj.source = 'dynamic-global-routing.cc'
+
+    obj = bld.create_ns3_program('static-routing-slash32',
+                                 ['point-to-point', 'internet-stack', 'global-routing'])
+    obj.source = 'static-routing-slash32.cc'
+
+    obj = bld.create_ns3_program('global-routing-slash32',
+                                 ['point-to-point', 'internet-stack', 'global-routing'])
+    obj.source = 'global-routing-slash32.cc'
+
+    obj = bld.create_ns3_program('simple-global-routing',
+                                 ['point-to-point', 'internet-stack', 'global-routing'])
+    obj.source = 'simple-global-routing.cc'
+
+    obj = bld.create_ns3_program('virtual-net-device',
+                                 ['point-to-point', 'internet-stack', 'global-routing', 'virtual-net-device'])
+    obj.source = 'virtual-net-device.cc'
+
+    obj = bld.create_ns3_program('simple-alternate-routing',
+                                 ['point-to-point', 'internet-stack', 'global-routing'])
+    obj.source = 'simple-alternate-routing.cc'
+
+    obj = bld.create_ns3_program('simple-error-model',
+                                 ['point-to-point', 'internet-stack'])
+    obj.source = 'simple-error-model.cc'
+
+    obj = bld.create_ns3_program('csma-one-subnet',
+                                 ['csma', 'internet-stack'])
+    obj.source = 'csma-one-subnet.cc'
+
+    obj = bld.create_ns3_program('csma-bridge',
+                                 ['bridge', 'csma', 'internet-stack'])
+    obj.source = 'csma-bridge.cc'
+
+    obj = bld.create_ns3_program('csma-bridge-one-hop',
+                                 ['bridge', 'csma', 'internet-stack'])
+    obj.source = 'csma-bridge-one-hop.cc'
+
+    obj = bld.create_ns3_program('udp-echo',
+                                 ['csma', 'internet-stack'])
+    obj.source = 'udp-echo.cc'
+
+    obj = bld.create_ns3_program('realtime-udp-echo',
+                                 ['csma', 'internet-stack'])
+    obj.source = 'realtime-udp-echo.cc'
+
+    obj = bld.create_ns3_program('csma-broadcast',
+                                 ['csma', 'internet-stack'])
+    obj.source = 'csma-broadcast.cc'
+
+    obj = bld.create_ns3_program('csma-packet-socket',
+                                 ['csma', 'internet-stack'])
+    obj.source = 'csma-packet-socket.cc'
+
+    obj = bld.create_ns3_program('csma-multicast',
+                                 ['csma', 'internet-stack'])
+    obj.source = 'csma-multicast.cc'
+
+    obj = bld.create_ns3_program( 'mixed-global-routing',
+                                  ['point-to-point', 'internet-stack', 'global-routing' , 'csma-cd'])
+    obj.source = 'mixed-global-routing.cc'
+
+    obj = bld.create_ns3_program('simple-point-to-point-olsr',
+                                 ['point-to-point', 'internet-stack', 'olsr'])
+    obj.source = 'simple-point-to-point-olsr.cc'
+
+    obj = bld.create_ns3_program('tcp-large-transfer',
+                                 ['point-to-point', 'internet-stack'])
+    obj.source = 'tcp-large-transfer.cc'
+
+    obj = bld.create_ns3_program('tcp-nsc-lfn',
+                                 ['point-to-point', 'internet-stack'])
+    obj.source = 'tcp-nsc-lfn.cc'
+
+    obj = bld.create_ns3_program('tcp-nsc-zoo',
+                                 ['csma', 'internet-stack'])
+    obj.source = 'tcp-nsc-zoo.cc'
+
+    obj = bld.create_ns3_program('tcp-star-server',
+                                 ['point-to-point', 'internet-stack'])
+    obj.source = 'tcp-star-server.cc'
+
+    obj = bld.create_ns3_program('star',
+                                 ['point-to-point', 'internet-stack'])
+    obj.source = 'star.cc'
+
+    obj = bld.create_ns3_program('csma-star',
+                                 ['csma', 'internet-stack'])
+    obj.source = 'csma-star.cc'
+
+    obj = bld.create_ns3_program('wifi-adhoc',
+                                 ['core', 'simulator', 'mobility', 'wifi'])
+    obj.source = 'wifi-adhoc.cc'
+
+    obj = bld.create_ns3_program('wifi-clear-channel-cmu',
+                                 ['core', 'simulator', 'mobility', 'wifi'])
+    obj.source = 'wifi-clear-channel-cmu.cc'
+
+    obj = bld.create_ns3_program('wifi-ap',
+                                 ['core', 'simulator', 'mobility', 'wifi'])
+    obj.source = 'wifi-ap.cc'
+
+    bld.add_subdirs('stats')
+
+    obj = bld.create_ns3_program('wifi-wired-bridging',
+                                 ['core', 'simulator', 'mobility', 'wifi', 
+                                  'csma', 'helper', 'bridge'])
+    obj.source = 'wifi-wired-bridging.cc'
+
+    obj = bld.create_ns3_program('csma-raw-ip-socket',
+        ['csma', 'internet-stack'])
+    obj.source = 'csma-raw-ip-socket.cc'
+
+    obj = bld.create_ns3_program('csma-ping',
+        ['csma', 'internet-stack', 'v4ping'])
+    obj.source = 'csma-ping.cc'
+
+    obj = bld.create_ns3_program('test-ipv6',
+      ['point-to-point', 'internet-stack'])
+    obj.source = 'test-ipv6.cc'
+
+    env = bld.env_of_name('default')
+    if env['ENABLE_EMU']:
+        obj = bld.create_ns3_program('emu-udp-echo', ['emu', 'internet-stack'])
+        obj.source = 'emu-udp-echo.cc'
+
+        obj = bld.create_ns3_program('emu-ping', ['emu', 'internet-stack'])
+        obj.source = 'emu-ping.cc'
+
+    if env['ENABLE_TAP']:
+        obj = bld.create_ns3_program('tap-wifi-dumbbell',
+                                     ['wifi', 'csma', 'point-to-point', 'tap-bridge', 'internet-stack'])
+        obj.source = 'tap-wifi-dumbbell.cc'
+
+    obj = bld.create_ns3_program('simple-wifi-frame-aggregation',
+                                 ['core', 'simulator', 'mobility', 'wifi'])
+    obj.source = 'simple-wifi-frame-aggregation.cc'
+
+    # RapidNet scripts
+    obj = bld.create_ns3_program('rapidnet-app-simulator')
+    obj.source = 'rapidnet-app-simulator.cc'
+
+    
+    #  EXCLUDED FOR COMPILATION
+    #obj = bld.create_ns3_program('rapidnet-app-emulator')
+    #obj.source = 'rapidnet-app-emulator.cc'   
+
+    obj = bld.create_ns3_program('pingpong-test')
+    obj.source = 'pingpong-test.cc'
+
+    obj = bld.create_ns3_program('arp-test')
+    obj.source = 'arp-test.cc'
+
+    obj = bld.create_ns3_program('firewall-test')
+    obj.source = 'firewall-test.cc'
+
+    obj = bld.create_ns3_program('sdn-arp-test')
+    obj.source = 'sdn-arp-test.cc'
+
+    obj = bld.create_ns3_program('reachable-test')
+    obj.source = 'reachable-test.cc'
+
+    # EXCLUDED FOR COMPILATION
+    #obj = bld.create_ns3_program('pathvector-test')
+    #obj.source = 'pathvector-test.cc'
+
+    obj = bld.create_ns3_program('epidemic-test')
+    obj.source = 'epidemic-test.cc'
+
+    obj = bld.create_ns3_program('sdn-mac-learning-test')
+    obj.source = 'sdn-mac-learning-test.cc'
+
+    obj = bld.create_ns3_program('sdn-mac-learning-bcast-test')
+    obj.source = 'sdn-mac-learning-bcast-test.cc'
+
+    # EXCLUDED FOR COMPILATION
+    #obj = bld.create_ns3_program('emu-ping-pong-test')
+    #obj.source = 'emu-ping-pong-test.cc'
+
+    obj = bld.create_ns3_program('load-balancing-test')
+    obj.source = 'load-balancing-test.cc'
+
+    obj = bld.create_ns3_program('sdn-load-balancing-test')
+    obj.source = 'sdn-load-balancing-test.cc'
+
+    obj = bld.create_ns3_program('load-balancer-learning-test')
+    obj.source = 'load-balancer-learning-test.cc'
+    
+    obj = bld.create_ns3_program('pathvector-prov-test')
+    obj.source = 'pathvector-prov-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-prov-test')
+    obj.source = 'pktfwd-prov-test.cc'
+
+    obj = bld.create_ns3_program('mincost-prov-test')
+    obj.source = 'mincost-prov-test.cc'  
+
+    obj = bld.create_ns3_program('mincost-query-test')
+    obj.source = 'mincost-query-test.cc'
+
+    obj = bld.create_ns3_program('secure-pathvector-test')
+    obj.source = 'secure-pathvector-test.cc'
+
+    obj = bld.create_ns3_program('secure-simple-bgp-test')
+    obj.source = 'secure-simple-bgp-test.cc'
+
+    obj = bld.create_ns3_program('secure-pingpong-test')
+    obj.source = 'secure-pingpong-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-sdn-test')
+    obj.source = 'pktfwd-sdn-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-sdn-prov-test')
+    obj.source = 'pktfwd-sdn-prov-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-sdn-prov-comp-test')
+    obj.source = 'pktfwd-sdn-prov-comp-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-sdn-prov-comp-static-check-test')
+    obj.source = 'pktfwd-sdn-prov-comp-static-check-test.cc'        
+
+    obj = bld.create_ns3_program('pktfwd-sdn-large-scale-test')
+    obj.source = 'pktfwd-sdn-large-scale-test.cc'        
+
+    obj = bld.create_ns3_program('pktfwd-sdn-large-scale-nocomp-test')
+    obj.source = 'pktfwd-sdn-large-scale-nocomp-test.cc'        
+
+    obj = bld.create_ns3_program('pktfwd-sdn-large-scale-strawman-test')
+    obj.source = 'pktfwd-sdn-large-scale-strawman-test.cc'        
+
+    obj = bld.create_ns3_program('pktfwd-norm-test')
+    obj.source = 'pktfwd-norm-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-norm-prov-test')
+    obj.source = 'pktfwd-norm-prov-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-norm-prov-comp-strawman-test')
+    obj.source = 'pktfwd-norm-prov-comp-strawman-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-norm-prov-comp-online-test')
+    obj.source = 'pktfwd-norm-prov-comp-online-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-norm-large-scale-nocomp-test')
+    obj.source = 'pktfwd-norm-large-scale-nocomp-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-norm-large-scale-strawman-test')
+    obj.source = 'pktfwd-norm-large-scale-strawman-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-norm-large-scale-online-test')
+    obj.source = 'pktfwd-norm-large-scale-online-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-norm-bandwidth-test')
+    obj.source = 'pktfwd-norm-bandwidth-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-norm-large-scale-nocomp-bandwidth-test')
+    obj.source = 'pktfwd-norm-large-scale-nocomp-bandwidth-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-norm-large-scale-strawman-bandwidth-test')
+    obj.source = 'pktfwd-norm-large-scale-strawman-bandwidth-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-norm-large-scale-online-bandwidth-test')
+    obj.source = 'pktfwd-norm-large-scale-online-bandwidth-test.cc'
+
+    
+    obj = bld.create_ns3_program('myproto-test')
+    obj.source = 'myproto-test.cc'
+
+    obj = bld.create_ns3_program('dns-test')
+    obj.source = 'dns-test.cc'
+    
+    obj = bld.create_ns3_program('dns-prov-test')
+    obj.source = 'dns-prov-test.cc'
+    
+    obj = bld.create_ns3_program('dns-prov-comp-strawman-test')
+    obj.source = 'dns-prov-comp-strawman-test.cc'
+
+    obj = bld.create_ns3_program('dns-prov-comp-online-test')
+    obj.source = 'dns-prov-comp-online-test.cc'
+
+    obj = bld.create_ns3_program('dns-prov-dist-hlist-rmitm-test')
+    obj.source = 'dns-prov-dist-hlist-rmitm-test.cc'
+
+    obj = bld.create_ns3_program('dns-prov-dhlist-layerhs-online-test')
+    obj.source = 'dns-prov-dhlist-layerhs-online-test.cc'
+
+    obj = bld.create_ns3_program('dns-prov-bandwidth-test')
+    obj.source = 'dns-prov-bandwidth-test.cc'
+
+    obj = bld.create_ns3_program('dns-prov-dist-hlist-rmitm-bandwidth-test')
+    obj.source = 'dns-prov-dist-hlist-rmitm-bandwidth-test.cc'
+
+    obj = bld.create_ns3_program('dns-prov-dhlist-layerhs-online-bandwidth-test')
+    obj.source = 'dns-prov-dhlist-layerhs-online-bandwidth-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-norm-prov-ete-test')
+    obj.source = 'pktfwd-norm-prov-ete-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-norm-large-scale-nocomp-ete-test')
+    obj.source = 'pktfwd-norm-large-scale-nocomp-ete-test.cc'
+
+    
+    obj = bld.create_ns3_program('pktfwd-norm-large-scale-strawman-ete-test')
+    obj.source = 'pktfwd-norm-large-scale-strawman-ete-test.cc'
+
+
+    obj = bld.create_ns3_program('pktfwd-norm-large-scale-online-ete-test')
+    obj.source = 'pktfwd-norm-large-scale-online-ete-test.cc'
+
+    
+    obj = bld.create_ns3_program('pktfwd-norm-dist-hlist-online-test')
+    obj.source = 'pktfwd-norm-dist-hlist-online-test.cc'
+
+    
+    obj = bld.create_ns3_program('pktfwd-norm-dist-hlist-rmitm-test')
+    obj.source = 'pktfwd-norm-dist-hlist-rmitm-test.cc'
+
+    
+    obj = bld.create_ns3_program('pktfwd-large-scale-dist-hlist-online-test')
+    obj.source = 'pktfwd-large-scale-dist-hlist-online-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-large-scale-dist-hlist-rmitm-test')
+    obj.source = 'pktfwd-large-scale-dist-hlist-rmitm-test.cc'
+    
+
+    obj = bld.create_ns3_program('pktfwd-norm-large-scale-nocomp-ete-bandwidth-test')
+    obj.source = 'pktfwd-norm-large-scale-nocomp-ete-bandwidth-test.cc'
+
+
+    obj = bld.create_ns3_program('pktfwd-large-scale-dhlist-layerhs-online-bandwidth-test')
+    obj.source = 'pktfwd-large-scale-dhlist-layerhs-online-bandwidth-test.cc'
+
+    
+    obj = bld.create_ns3_program('pktfwd-large-scale-dist-hlist-rmitm-bandwidth-test')
+    obj.source = 'pktfwd-large-scale-dist-hlist-rmitm-bandwidth-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-large-scale-dhlist-layerhs-online-test')
+    obj.source = 'pktfwd-large-scale-dhlist-layerhs-online-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-norm-large-scale-nocomp-ete-Scaling-test')
+    obj.source = 'pktfwd-norm-large-scale-nocomp-ete-Scaling-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-large-scale-dist-hlist-rmitm-Scaling-test')
+    obj.source = 'pktfwd-large-scale-dist-hlist-rmitm-Scaling-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-large-scale-dhlist-layerhs-online-Scaling-test')
+    obj.source = 'pktfwd-large-scale-dhlist-layerhs-online-Scaling-test.cc'
+
+    
+    obj = bld.create_ns3_program('pktfwd-norm-large-scale-nocomp-ete-Pair-Scaling-test')
+    obj.source = 'pktfwd-norm-large-scale-nocomp-ete-Pair-Scaling-test.cc'
+
+    
+    obj = bld.create_ns3_program('pktfwd-large-scale-dist-hlist-rmitm-Pair-Scaling-test')
+    obj.source = 'pktfwd-large-scale-dist-hlist-rmitm-Pair-Scaling-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-large-scale-dhlist-layerhs-online-Pair-Scaling-test')
+    obj.source = 'pktfwd-large-scale-dhlist-layerhs-online-Pair-Scaling-test.cc'
+
+
+    obj = bld.create_ns3_program('pktfwd-norm-large-scale-nocomp-ete-Storage-Rate-vs-Time-test')
+    obj.source = 'pktfwd-norm-large-scale-nocomp-ete-Storage-Rate-vs-Time-test.cc'
+    
+    obj = bld.create_ns3_program('pktfwd-large-scale-dist-hlist-rmitm-Storage-Rate-vs-Time-test')
+    obj.source = 'pktfwd-large-scale-dist-hlist-rmitm-Storage-Rate-vs-Time-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-large-scale-dhlist-layerhs-online-Storage-Rate-vs-Time-test')
+    obj.source = 'pktfwd-large-scale-dhlist-layerhs-online-Storage-Rate-vs-Time-test.cc'
+
+    
+    obj = bld.create_ns3_program('pktfwd-norm-large-scale-nocomp-ete-Storage-vs-Time-test')
+    obj.source = 'pktfwd-norm-large-scale-nocomp-ete-Storage-vs-Time-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-large-scale-dist-hlist-rmitm-Storage-vs-Time-test')
+    obj.source = 'pktfwd-large-scale-dist-hlist-rmitm-Storage-vs-Time-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-large-scale-dhlist-layerhs-online-Storage-vs-Time-test')
+    obj.source = 'pktfwd-large-scale-dhlist-layerhs-online-Storage-vs-Time-test.cc'
+
+
+    obj = bld.create_ns3_program('dns-prov-Scale-Requests-test')
+    obj.source = 'dns-prov-Scale-Requests-test.cc'
+
+    
+    obj = bld.create_ns3_program('dns-prov-dist-hlist-rmitm-Scale-Requests-test')
+    obj.source = 'dns-prov-dist-hlist-rmitm-Scale-Requests-test.cc'
+
+
+    
+    obj = bld.create_ns3_program('dns-prov-dhlist-layerhs-online-Scale-Requests-test')
+    obj.source = 'dns-prov-dhlist-layerhs-online-Scale-Requests-test.cc'
+
+    
+    obj = bld.create_ns3_program('dns-prov-Scale-URLs-test')
+    obj.source = 'dns-prov-Scale-URLs-test.cc'
+
+    
+    obj = bld.create_ns3_program('dns-prov-dist-hlist-rmitm-Scale-URLs-test')
+    obj.source = 'dns-prov-dist-hlist-rmitm-Scale-URLs-test.cc'
+
+    
+    obj = bld.create_ns3_program('dns-prov-dhlist-layerhs-online-Scale-URLs-test')
+    obj.source = 'dns-prov-dhlist-layerhs-online-Scale-URLs-test.cc'
+
+
+    obj = bld.create_ns3_program('pktfwd-norm-prov-enabled-test')
+    obj.source = 'pktfwd-norm-prov-enabled-test.cc'
+
+    
+    obj = bld.create_ns3_program('pktfwd-norm-prov-query-test')
+    obj.source = 'pktfwd-norm-prov-query-test.cc'
+
+    
+    obj = bld.create_ns3_program('pktfwd-norm-dist-hlist-rmitm-query-test')
+    obj.source = 'pktfwd-norm-dist-hlist-rmitm-query-test.cc'
+
+    
+    obj = bld.create_ns3_program('pktfwd-norm-dhlist-layerhs-online-query-test')
+    obj.source = 'pktfwd-norm-dhlist-layerhs-online-query-test.cc'
+
+
+    obj = bld.create_ns3_program('pktfwd-check-pathLength-test')
+    obj.source = 'pktfwd-check-pathLength.cc'
+
+    obj = bld.create_ns3_program('pktfwd-norm-prov-query-ptp-test')
+    obj.source = 'pktfwd-norm-prov-query-ptp-test.cc'
+
+    
+    obj = bld.create_ns3_program('pktfwd-norm-dist-hlist-rmitm-query-ptp-test')
+    obj.source = 'pktfwd-norm-dist-hlist-rmitm-query-ptp-test.cc'
+
+    
+    obj = bld.create_ns3_program('pktfwd-norm-dhlist-layerhs-online-query-ptp-test')
+    obj.source = 'pktfwd-norm-dhlist-layerhs-online-query-ptp-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-gen-bandwidth-test')
+    obj.source = 'pktfwd-gen-bandwidth-test.cc'
+
+    obj = bld.create_ns3_program('pktfwd-large-scale-test')
+    obj.source = 'pktfwd-large-scale-test.cc'
+
+    obj = bld.create_ns3_program('dns-prov-test')
+    obj.source = 'dns-prov-test.cc'
+
+    obj = bld.create_ns3_program('dns-gen-bandwidth-test')
+    obj.source = 'dns-gen-bandwidth-test.cc'
+
+    obj = bld.create_ns3_program('ping-pong-l4-test')
+    obj.source = 'ping-pong-l4.cpp'

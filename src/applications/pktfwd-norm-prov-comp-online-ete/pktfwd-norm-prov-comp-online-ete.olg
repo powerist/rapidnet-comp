@@ -47,12 +47,7 @@ prov_rs1_4 packetProv(@Next, SrcAdd, DstAdd, Data, NewTag) :-
 	   NewTag := f_concat(Tag, Hash).
 
 /* Rules for normal execution without provenance */
-/*
-rs1 packetNonProv(@Next, SrcAdd, DstAdd, Data, PIDequi, PIDev) :-
-        packetNonProv(@Node, SrcAdd, DstAdd, Data, PIDequi, PIDev),
-	flowEntry(@Node, DstAdd, Next),
-	link(@Node, Next).
-*/
+
 rs1 packet(@Next, SrcAdd, DstAdd, Data, PIDHash) :-
         packet(@Node, SrcAdd, DstAdd, Data, PIDHash),
 	flowEntry(@Node, DstAdd, Next),
@@ -72,18 +67,10 @@ rh102 equiHashTable(@Node, DstAdd, PIDequi) :-
     initPacketCount(@Node, SrcAdd, DstAdd, Data, PIDequi, PIDcount),
     PIDcount == 0.
 
-/*
-rh103 packetNonProv(@Switch, SrcAdd, DstAdd, Data, PIDequi, PIDev) :-
-    device(@Host, Dvtype),
-    initPacketCount(@Host, SrcAdd, DstAdd, Data, PIDequi, PIDcount),
-    linkhr(@Host, Switch),
-    Dvtype == HOST,
-    PIDev := f_sha1("initPacket" + Host + SrcAdd + DstAdd + Data),
-    PIDcount != 0.
-*/
 rh103 packet(@Next, SrcAdd, DstAdd, Data, PIDHash) :-
     initPacketCount(@Node, SrcAdd, DstAdd, Data, PIDequi, PIDcount),
-    linkhr(@Node, Next),
+    flowEntry(@Node, DstAdd, Next), 
+    link(@Node, Next),
     PIDev := f_sha1("initPacket" + Node + SrcAdd + DstAdd + Data),
     PIDcount != 0,
     PIDequiHash := f_append(PIDequi),
@@ -92,13 +79,14 @@ rh103 packet(@Next, SrcAdd, DstAdd, Data, PIDHash) :-
 
 prov_rh1_1 epacketTemp(@RLOC, Next, SrcAdd, DstAdd, Data, RID, R, List, Tag) :- 
 	   initPacketCount(@Node, SrcAdd, DstAdd, Data, PIDequi, PIDcount),
+	   flowEntry(@Node, DstAdd, Next), 
 	   link(@Node, Next),
 	   PIDcount == 0,
 	   PIDev := f_sha1(((("initPacket"+ Node)+ SrcAdd)+ DstAdd)+ Data),
 	   Equilist := f_append(PIDequi),
            Evlist := f_append(PIDev),
            Tag := f_concat(Equilist, Evlist), 
-	   PID2 := f_sha1(("linkhr"+ Node)+ Next), 
+	   PID2 := f_sha1(("link"+ Node)+ Next), 
 	   List := f_append(PID2), 
 	   RLOC := Node, 
 	   R := "rh1", 

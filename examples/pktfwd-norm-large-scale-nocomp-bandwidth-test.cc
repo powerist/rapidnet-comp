@@ -580,8 +580,8 @@ void SchedulePacketTrans(int totalNum, int totalSwcNum, int hostPairs, int packe
           Simulator::Schedule (Seconds (insert_time), PacketInsertion, src, dst, data);
         }
     }
-
-  //Extra functionality: calculate the total number of hops and output to file
+ 
+ //Extra functionality: calculate the total number of hops and output to file
   std::ofstream hopCountFile;
   hopCountFile.open ("/localdrive1/chen/hopCount.dat", ios::out | ios::app);
   hopCountFile << hostPairs << "\t" << totalHops << "\n";

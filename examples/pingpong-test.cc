@@ -59,7 +59,7 @@ main (int argc, char *argv[])
   apps.Stop (Seconds (10.0));
 
   schedule (0.0001, UpdateLinks1);
-  Simulator::Run ();
+  Simulator::Run ();
   Simulator::Destroy ();
   return 0;
 }

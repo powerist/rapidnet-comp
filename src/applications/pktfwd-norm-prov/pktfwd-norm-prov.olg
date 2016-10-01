@@ -9,6 +9,7 @@ materialize(device,infinity,infinity,keys(2:int32)). /*Identify the device type 
 
 /* Provenance tables*/
 materialize(ruleExec, infinity, infinity, keys(4:list)).
+materialize(prov, infinity, infinity, keys(2:cid,3,4:cid)).
 
 #define SWITCH 0
 #define HOST 1

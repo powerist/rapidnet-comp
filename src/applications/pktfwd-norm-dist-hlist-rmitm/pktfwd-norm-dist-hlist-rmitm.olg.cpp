@@ -41,13 +41,14 @@ prov_rs1_3 packet(@Next, SrcAdd, DstAdd, Data, RLOC, RID) :-
 /* Packet initialization*/
 prov_rh1_1 epacketTemp(@RLOC, Next, SrcAdd, DstAdd, Data, RID, R, List, PreInfolist) :-
     initPacket(@Node, SrcAdd, DstAdd, Data),
+    flowEntry(@Node,DstAdd,Next),
     link(@Node, Next),
     PID2 := f_sha1(((("initPacket"+ Node)+ SrcAdd)+ DstAdd)+ Data),
     List := f_append(PID2),
-    PID3 := f_sha1(("linkhr"+ Node)+ Next),
+    PID3 := f_sha1(("link"+ Node)+ Next),
     List3 := f_append(PID3),
     List := f_concat(List, List3),
-    PreLoc := RLOC,
+    PreLoc := Node,
     PreLoclist := f_append(PreLoc),
     PreRID := f_sha1("NULL"),
     PreRIDlist := f_append(PreRID),

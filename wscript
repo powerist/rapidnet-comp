@@ -220,6 +220,9 @@ def report_optional_feature(conf, name, caption, was_enabled, reason_not_enabled
     conf.env.append_value('NS3_OPTIONAL_FEATURES', (name, caption, was_enabled, reason_not_enabled))
 
 def configure(conf):
+    # add crypto files
+    conf.env.append_value("LINKFLAGS","-lcrypto")
+    conf.env.append_value("LINKFLAGS","-lssl")
     # attach some extra methods
     conf.check_compilation_flag = types.MethodType(_check_compilation_flag, conf)
     conf.report_optional_feature = types.MethodType(report_optional_feature, conf)

@@ -44,10 +44,11 @@ prov_rs1_4 packet(@Next, SrcAdd, DstAdd, Data, NewHashList) :-
 /*Host program*/
 prov_rh1_1 epacketTemp(@RLOC, Next, SrcAdd, DstAdd, Data, RID, R, List, HashList) :-
     initPacket(@Node, SrcAdd, DstAdd, Data),
-    linkhr(@Node, Next),
+    flowEntry(@Node, DstAdd, Next),
+    link(@Node, Next),
     PIDev := f_sha1(((("initPacket"+ Node)+ SrcAdd)+ DstAdd)+ Data),
     HashList := f_append(PIDev),
-    PID2 := f_sha1(("linkhr"+ Node)+ Next),
+    PID2 := f_sha1(("link"+ Node)+ Next),
     List := f_append(PID2),
     RLOC := Node,
     R := "rh1",
