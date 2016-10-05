@@ -23,6 +23,7 @@
 #include "rapidnet-functions.h"
 #include "rapidnet-header.h"
 #include "rapidnet-script-utils.h"
+#include "rapidnet-tcp-connection.h"
 #include "rapidnet-utils.h"
 #include "relation-base.h"
 #include "relation.h"

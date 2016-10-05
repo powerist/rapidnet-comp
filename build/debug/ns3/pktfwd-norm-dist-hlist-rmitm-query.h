@@ -32,33 +32,27 @@ public:
   static const string BASEQUERY;
   static const string BASERETURN;
   static const string CHILDWAIT;
-
   static const string EPRETURN;
   static const string ERRETURN;
   static const string ERULEQUERY;
-
   static const string EPACKETTEMP;
   static const string ERECVPACKETTEMP;
   static const string FLOWENTRY;
   static const string INITPACKET;
-
   static const string INITPROVQUERY;
   static const string LINK;
   static const string PITERATE;
   static const string PQLIST;
-
   static const string PRESULTTMP;
   static const string PRETURN;
   static const string PACKET;
   static const string PROV;
   static const string PROVQUERY;
-
   static const string PROVROOT;
   static const string RITERATE;
   static const string RQLIST;
   static const string RRESULTTMP;
   static const string RRETURN;
-
   static const string RECORDPROV;
   static const string RECORDSD;
   static const string RECVCOUNT;
@@ -104,7 +98,6 @@ protected:
 
   virtual void Prov_rh1_1Eca0Ins (Ptr<Tuple> initPacket);
 
-
   virtual void Prov_rh1_1Eca1Ins (Ptr<Tuple> flowEntry);
 
   virtual void Prov_rh1_1Eca2Ins (Ptr<Tuple> link);
@@ -112,7 +105,6 @@ protected:
   virtual void Prov_rh2_1_eca (Ptr<Tuple> packet);
 
   virtual void Prov_rh2_2_eca (Ptr<Tuple> erecvPacketTemp);
-
 
   virtual void Prov_rh2_3_eca (Ptr<Tuple> erecvPacketTemp);
 

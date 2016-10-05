@@ -123,6 +123,8 @@ def build(bld):
         'deprecated.h',
         'abort.h',
         'names.h',
+        'simple-ref-count.h',
+        'default-deleter.h'
         ]
 
     if sys.platform == 'win32':

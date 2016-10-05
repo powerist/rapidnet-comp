@@ -94,7 +94,7 @@ ofstream* decorator_out = InstallDecorator(apps, ".", 2000, 2000);
   // Set default value
   if (destLocSpec == "")
     destLocSpec = app (1)->GetLocalLocSpec ();
-
+  
   apps.Start (Seconds (0.0));
   apps.Stop (Seconds (50.0));
 
