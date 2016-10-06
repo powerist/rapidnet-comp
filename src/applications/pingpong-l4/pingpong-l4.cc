@@ -19,8 +19,6 @@ using namespace ns3::rapidnet::pingpongl4;
 const string PingpongL4::EPING = "ePing";
 const string PingpongL4::EPINGPONGFINISH = "ePingPongFinish";
 const string PingpongL4::EPONG = "ePong";
-const string PingpongL4::PERIODIC = "periodic";
-const string PingpongL4::R1_ECAPERIODIC = "r1_ecaperiodic";
 const string PingpongL4::TLINK = "tLink";
 
 NS_LOG_COMPONENT_DEFINE ("PingpongL4");
@@ -60,8 +58,6 @@ PingpongL4::StartApplication (void)
   NS_LOG_FUNCTION_NOARGS ();
 
   RapidNetApplicationBase::StartApplication ();
-  m_event_r1_ecaperiodic=
-    Simulator::Schedule (Seconds (0), &PingpongL4::R1_ecaperiodic, this);
   RAPIDNET_LOG_INFO("PingpongL4 Application Started");
 }
 
@@ -71,7 +67,6 @@ PingpongL4::StopApplication ()
   NS_LOG_FUNCTION_NOARGS ();
 
   RapidNetApplicationBase::StopApplication ();
-  Simulator::Cancel(m_event_r1_ecaperiodic);
   RAPIDNET_LOG_INFO("PingpongL4 Application Stopped");
 }
 
@@ -91,9 +86,9 @@ PingpongL4::DemuxRecv (Ptr<Tuple> tuple)
 {
   RapidNetApplicationBase::DemuxRecv (tuple);
 
-  if (IsRecvEvent (tuple, R1_ECAPERIODIC))
+  if (IsInsertEvent (tuple, TLINK))
     {
-      R1_eca (tuple);
+      R1Eca0Ins (tuple);
     }
   if (IsRecvEvent (tuple, EPING))
     {
@@ -106,34 +101,16 @@ PingpongL4::DemuxRecv (Ptr<Tuple> tuple)
 }
 
 void
-PingpongL4::R1_ecaperiodic ()
+PingpongL4::R1Eca0Ins (Ptr<Tuple> tLink)
 {
-  RAPIDNET_LOG_INFO ("R1_ecaperiodic triggered");
+  RAPIDNET_LOG_INFO ("R1Eca0Ins triggered");
 
-  SendLocal (tuple (R1_ECAPERIODIC, attrlist (
-    attr ("r1_ecaperiodic_attr1", Ipv4Value, GetAddress ()),
-    attr ("r1_ecaperiodic_attr2", Int32Value, rand ()))));
-
-  m_event_r1_ecaperiodic = Simulator::Schedule (Seconds(5),
-    &PingpongL4::R1_ecaperiodic, this);
-}
-
-void
-PingpongL4::R1_eca (Ptr<Tuple> r1_ecaperiodic)
-{
-  RAPIDNET_LOG_INFO ("R1_eca triggered");
-
-  Ptr<RelationBase> result;
-
-  result = GetRelation (TLINK)->Join (
-    r1_ecaperiodic,
-    strlist ("tLink_attr1"),
-    strlist ("r1_ecaperiodic_attr1"));
+  Ptr<Tuple> result = tLink;
 
   result = result->Project (
     EPING,
     strlist ("tLink_attr2",
-      "r1_ecaperiodic_attr1",
+      "tLink_attr1",
       "tLink_attr2"),
     strlist ("ePing_attr1",
       "ePing_attr2",

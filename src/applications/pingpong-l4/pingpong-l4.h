@@ -32,8 +32,6 @@ public:
   static const string EPING;
   static const string EPINGPONGFINISH;
   static const string EPONG;
-  static const string PERIODIC;
-  static const string R1_ECAPERIODIC;
   static const string TLINK;
 
   static TypeId GetTypeId (void);
@@ -54,15 +52,12 @@ protected:
 
   virtual void DemuxRecv (Ptr<Tuple> tuple);
 
-  virtual void R1_ecaperiodic ();
-
-  virtual void R1_eca (Ptr<Tuple> r1_ecaperiodic);
+  virtual void R1Eca0Ins (Ptr<Tuple> tLink);
 
   virtual void R2_eca (Ptr<Tuple> ePing);
 
   virtual void R3_eca (Ptr<Tuple> ePong);
 
-  EventId m_event_r1_ecaperiodic;
 };
 
 } // namespace pingpongl4
