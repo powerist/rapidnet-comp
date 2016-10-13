@@ -23,7 +23,7 @@
 #include "ns3/l4-platform-helper.h"
 #include "ns3/uinteger.h"
 #include <iostream>
-
+#include <sstream>
 #define tlink(src, next) \
   tuple (PingpongL4::TLINK, \
     attr ("tLink_attr1", StrValue, src), \
@@ -44,12 +44,13 @@ using namespace ns3::rapidnet::pingpongl4;
 
 ApplicationContainer apps;
 string destLocSpec = "", localPort = "";
-
+string localIPAddress = "";
 void
 UpdateLinks1 ()
 {
   app(1)->Insert (tlink (app(1)->GetLocalLocSpec(), destLocSpec));
 }
+
 
 int
 main (int argc, char *argv[])
@@ -64,8 +65,10 @@ main (int argc, char *argv[])
   uint16_t port;
 
   CommandLine cmd;
+  
   cmd.AddValue ("dest", "Destination LocSpec IP:Port", destLocSpec);
   cmd.AddValue ("localPort", "Local RapidNet port", localPort);
+  cmd.AddValue ("localIPAddress", "Local IPAddress", localIPAddress);
   cmd.Parse (argc, argv);
 
   if (localPort != "")
@@ -77,7 +80,15 @@ main (int argc, char *argv[])
   {
     port = 11111;
   }
- 
+
+  //stringstream tempSpec;
+  //tempSpec<<localIPAddress<<":";
+  //tempSpec<<port;
+  //cout<<tempSpec.str()<<endl;
+  //cout<<(app(1)->GetIpv4Address(tempSpec.str())).Get()<<endl;
+  //if(localIPAddress != "")
+  //app(1)->SetAddress(app(1)->GetIpv4Address(tempSpec.str()));
+
   // Install L4-Platform
   NodeContainer nodeContainer;
   nodeContainer.Create (1);
