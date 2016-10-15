@@ -114,10 +114,9 @@ RapidNetApplicationBase::GetAddress (void)
 Ipv4Address
 RapidNetApplicationBase::GetIpv4Address (string locspec)
 {
+  
   std::vector<std::string> tokens;
-  // cout<<"HERE BEFORE TOKENIZE"<<endl;
   Tokenize (locspec, tokens, ":");
-  //cout<<"HERE AFTER TOKENIZE"<<endl;
   if (tokens.size() == 0)
     return "0.0.0.0";
   std::vector<std::string>::iterator iter = tokens.begin();

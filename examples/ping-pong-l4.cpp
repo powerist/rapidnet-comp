@@ -51,6 +51,10 @@ UpdateLinks1 ()
   app(1)->Insert (tlink (app(1)->GetLocalLocSpec(), destLocSpec));
 }
 
+void UpdateIPAddress()
+{
+  app(1)->SetAddress(app(1)->GetIpv4Address("158.130.56.130:1111"));
+}
 
 int
 main (int argc, char *argv[])
@@ -81,13 +85,15 @@ main (int argc, char *argv[])
     port = 11111;
   }
 
-  //stringstream tempSpec;
-  //tempSpec<<localIPAddress<<":";
-  //tempSpec<<port;
+  stringstream tempSpec;
+  tempSpec<<localIPAddress<<":";
+  tempSpec<<port;
+  //tempSpec.str("158.130.56.13:1111");
   //cout<<tempSpec.str()<<endl;
   //cout<<(app(1)->GetIpv4Address(tempSpec.str())).Get()<<endl;
-  //if(localIPAddress != "")
-  //app(1)->SetAddress(app(1)->GetIpv4Address(tempSpec.str()));
+  if(localIPAddress != "")
+    schedule(0.00001, UpdateIPAddress);
+
 
   // Install L4-Platform
   NodeContainer nodeContainer;
@@ -100,7 +106,7 @@ main (int argc, char *argv[])
   // Install ping pong
   apps = helper.Install (nodeContainer);
 
-ofstream* decorator_out = InstallDecorator(apps, ".", 2000, 2000);
+  ofstream* decorator_out = InstallDecorator(apps, ".", 2000, 2000);
 
   // Set default value
   if (destLocSpec == "")
